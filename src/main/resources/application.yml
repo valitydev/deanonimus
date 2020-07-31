@@ -17,9 +17,13 @@ spring:
   output:
     ansi:
       enabled: always
+  elasticsearch:
+    rest:
+      uris: "http://localhost:9200"
 info:
   version: '@project.version@'
   stage: dev
+
 
 kafka:
   bootstrap-servers: localhost:9092
