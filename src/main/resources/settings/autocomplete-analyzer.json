@@ -1,0 +1,42 @@
+{
+  "analysis": {
+    "filter": {
+      "autocomplete_filter": {
+        "type": "edge_ngram",
+        "min_gram": 1,
+        "max_gram": 20
+      }
+    },
+    "analyzer": {
+      "autocomplete": {
+        "type": "custom",
+        "tokenizer": "standard",
+        "char_filter": [
+          "url_prefix_filter"
+        ],
+        "filter": [
+          "lowercase",
+          "autocomplete_filter"
+        ]
+      },
+      "write_url_analyzer": {
+        "type": "custom",
+        "tokenizer": "standard",
+        "char_filter": [
+          "url_prefix_filter"
+        ],
+        "filter": [
+          "lowercase"
+        ]
+      }
+    },
+    "char_filter": {
+      "url_prefix_filter": {
+        "type": "pattern_replace",
+        "pattern": "^(https?:\\/\\/)?(www\\.)?",
+        "replacement": ""
+      }
+    }
+  }
+}
+
