@@ -1,10 +1,16 @@
 package com.rbkmoney.deanonimus.domain;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Shop {
     @Field(type = FieldType.Keyword)
     private String id;

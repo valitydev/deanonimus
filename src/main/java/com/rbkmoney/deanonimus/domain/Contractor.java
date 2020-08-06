@@ -1,10 +1,16 @@
 package com.rbkmoney.deanonimus.domain;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Contractor {
     private String id;
     private String partyId;
@@ -16,13 +22,11 @@ public class Contractor {
     @Field(type = FieldType.Text, analyzer = "autocomplete", searchAnalyzer = "standard")
     private String russianLegalEntityRegisteredName;
     private String russianLegalEntityRegisteredNumber;
-    @Field(type = FieldType.Text, analyzer = "autocomplete", searchAnalyzer = "standard")
+    @Field(type = FieldType.Keyword)
     private String russianLegalEntityInn;
     private String russianLegalEntityActualAddress;
     private String russianLegalEntityPostAddress;
-    private String russianLegalEntityRepresentativePosition;
-    private String russianLegalEntityRepresentativeFullName;
-    private String russianLegalEntityRepresentativeDocument;
+    @Field(type = FieldType.Keyword)
     private String russianLegalEntityRussianBankAccount;
     private String russianLegalEntityRussianBankName;
     private String russianLegalEntityRussianBankPostAccount;
@@ -34,10 +38,4 @@ public class Contractor {
     private String internationalLegalEntityRegisteredAddress;
     private String internationalLegalEntityActualAddress;
     private String internationalLegalEntityRegisteredNumber;
-    private PrivateEntity privateEntity;
-    private String russianPrivateEntityFirstName;
-    private String russianPrivateEntitySecondName;
-    private String russianPrivateEntityMiddleName;
-    private String russianPrivateEntityPhoneNumber;
-    private String russianPrivateEntityEmail;
 }

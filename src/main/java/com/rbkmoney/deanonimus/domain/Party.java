@@ -1,16 +1,24 @@
 package com.rbkmoney.deanonimus.domain;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.elasticsearch.annotations.*;
+import org.springframework.data.elasticsearch.annotations.Document;
+import org.springframework.data.elasticsearch.annotations.Field;
+import org.springframework.data.elasticsearch.annotations.FieldType;
+import org.springframework.data.elasticsearch.annotations.Setting;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Data
-@Document(indexName = "party", createIndex = true)
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Document(indexName = "party")
 @Setting(settingPath = "/settings/autocomplete-analyzer.json")
 public class Party {
 
@@ -18,8 +26,6 @@ public class Party {
     private String id;
     @Field(type = FieldType.Text, analyzer = "autocomplete", searchAnalyzer = "standard")
     private String email;
-    @Field(type = FieldType.Date, store = true, format = DateFormat.date_hour_minute_second_millis, index = false)
-    private LocalDateTime createdAt;
 
     private Blocking blocking;
     private Suspension suspension;
@@ -30,8 +36,6 @@ public class Party {
     private List<Contract> contracts;
     @Field(type = FieldType.Nested, store = true)
     private List<Shop> shops;
-    @Field(type = FieldType.Nested, store = true)
-    private List<Wallet> wallets;
 
     public void addShop(Shop shop) {
         if (this.shops == null) {
@@ -54,13 +58,6 @@ public class Party {
         this.contractors.add(contractor);
     }
 
-    public void addWallet(Wallet wallet) {
-        if (this.wallets == null) {
-            this.wallets = new ArrayList<>();
-        }
-        this.wallets.add(wallet);
-    }
-
     public Optional<Shop> getShopById(String id) {
         return this.shops.stream().filter(shop -> shop.getId().equals(id)).findFirst();
     }
@@ -71,10 +68,6 @@ public class Party {
 
     public Optional<Contractor> getContractorById(String id) {
         return this.contractors.stream().filter(contractor -> contractor.getId().equals(id)).findFirst();
-    }
-
-    public Optional<Wallet> getWalletById(String id) {
-        return this.wallets.stream().filter(wallet -> wallet.getId().equals(id)).findFirst();
     }
 
 }

@@ -7,7 +7,6 @@ import com.rbkmoney.deanonimus.domain.Blocking;
 import com.rbkmoney.deanonimus.domain.Party;
 import com.rbkmoney.deanonimus.domain.Suspension;
 import com.rbkmoney.deanonimus.kafka.handler.party_mngmnt.PartyManagementHandler;
-import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.geck.filter.Filter;
 import com.rbkmoney.geck.filter.PathConditionFilter;
 import com.rbkmoney.geck.filter.condition.IsNullCondition;
@@ -18,8 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
 
 @Slf4j
 @Component
@@ -41,8 +38,6 @@ public class PartyCreatedHandler implements PartyManagementHandler {
         Party party = new Party();
         party.setId(partyId);
         party.setEmail(partyCreated.getContactInfo().getEmail());
-        LocalDateTime partyCreatedAt = TypeUtil.stringToLocalDateTime(partyCreated.getCreatedAt());
-        party.setCreatedAt(partyCreatedAt);
         party.setBlocking(Blocking.unblocked);
         party.setSuspension(Suspension.active);
 

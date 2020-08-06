@@ -1,7 +1,11 @@
 package com.rbkmoney.deanonimus;
 
-import com.rbkmoney.damsel.domain.*;
-import com.rbkmoney.damsel.payment_processing.*;
+import com.rbkmoney.damsel.domain.Blocked;
+import com.rbkmoney.damsel.domain.Blocking;
+import com.rbkmoney.damsel.domain.PartyContactInfo;
+import com.rbkmoney.damsel.payment_processing.EventPayload;
+import com.rbkmoney.damsel.payment_processing.PartyChange;
+import com.rbkmoney.damsel.payment_processing.PartyCreated;
 import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.geck.serializer.kit.mock.FieldHandler;
 import com.rbkmoney.geck.serializer.kit.mock.MockMode;
@@ -36,24 +40,14 @@ public class TestData {
         mockTBaseProcessor.addFieldHandler(timeFields.getKey(), timeFields.getValue());
     }
 
-    public static final String SOURCE_ID_ONE = "source1";
-    public static final String EMAIL_ONE = "email1@mail.ru";
-    private static String SHOP_ID_ONE = "shop";
-    private static String CONTRACT_ID_ONE = "contract";
-    private static String PAYOUT_TOOL_ID_ONE = "payoutTool";
+    public static final String SOURCE_ID_ONE = "source";
+    public static final String EMAIL_ONE = "email@mail.ru";
     public static final LocalDateTime TIME_ONE = LocalDateTime.now();
 
     public static SinkEvent createSinkEvent(String sourceId, PartyChange partyChange) {
 
         SinkEvent sinkEvent = new SinkEvent();
         sinkEvent.setEvent(createMessage(sourceId).setData(wrapEventPayload(List.of(partyChange))));
-        return sinkEvent;
-    }
-
-    public static SinkEvent createSinkEventWithManyChangesInPayload(String sourceId, List<PartyChange> partyChanges) {
-
-        SinkEvent sinkEvent = new SinkEvent();
-        sinkEvent.setEvent(createMessage(sourceId).setData(wrapEventPayload(partyChanges)));
         return sinkEvent;
     }
 
@@ -107,30 +101,47 @@ public class TestData {
         );
     }
 
-    public static PartyChange shopCreated() {
-        return fillTBaseObject(PartyChange.claim_created(
-                new Claim(1L,
-                        ClaimStatus.accepted(new ClaimAccepted().setEffects(
-                                List.of(ClaimEffect.shop_effect(new ShopEffectUnit(
-                                                SHOP_ID_ONE,
-                                                ShopEffect.created(new Shop(
-                                                        SHOP_ID_ONE,
-                                                        TypeUtil.temporalToString(TIME_ONE),
-                                                        Blocking.unblocked(new Unblocked("Потому что", TypeUtil.temporalToString(TIME_ONE))),
-                                                        Suspension.active(new Active(TypeUtil.temporalToString(TIME_ONE))),
-                                                        new ShopDetails("myshop"),
-                                                        ShopLocation.url("http://localhost.ru"),
-                                                        new CategoryRef(1),
-                                                        CONTRACT_ID_ONE
-                                                ))
-                                                )
-                                        )
-                                )
-                        )),
-                        List.of(),
-                        1,
-                        TypeUtil.temporalToString(TIME_ONE)
-                )), PartyChange.class);
+    public static com.rbkmoney.deanonimus.domain.Shop shop(String id, String url) {
+        return com.rbkmoney.deanonimus.domain.Shop.builder()
+                .id(id)
+                .locationUrl(url)
+                .build();
+    }
 
+    public static com.rbkmoney.deanonimus.domain.Contract contract(String id,
+                                                                   Integer termsId,
+                                                                   String legalAgreementId,
+                                                                   String reportActSignerFullName) {
+        return com.rbkmoney.deanonimus.domain.Contract.builder()
+                .id(id)
+                .termsId(termsId)
+                .legalAgreementId(legalAgreementId)
+                .reportActSignerFullName(reportActSignerFullName)
+                .build();
+    }
+
+    public static com.rbkmoney.deanonimus.domain.Contractor contractor(String id,
+                                                                       String registeredUserEmail,
+                                                                       String russianLegalEntityRegisteredName,
+                                                                       String russianLegalEntityRegisteredInn,
+                                                                       String russianLegalEntityRussianBankAccount,
+                                                                       String internationalLegalEntityLegalName,
+                                                                       String internationalLegalEntityTradingName) {
+        return com.rbkmoney.deanonimus.domain.Contractor.builder()
+                .id(id)
+                .registeredUserEmail(registeredUserEmail)
+                .russianLegalEntityRegisteredName(russianLegalEntityRegisteredName)
+                .russianLegalEntityRussianBankAccount(russianLegalEntityRussianBankAccount)
+                .russianLegalEntityInn(russianLegalEntityRegisteredInn)
+                .internationalLegalEntityLegalName(internationalLegalEntityLegalName)
+                .internationalLegalEntityTradingName(internationalLegalEntityTradingName)
+                .build();
+    }
+
+    public static com.rbkmoney.deanonimus.domain.Party party(String id, String email) {
+        return com.rbkmoney.deanonimus.domain.Party.builder()
+                .id(id)
+                .email(email)
+                .build();
     }
 }

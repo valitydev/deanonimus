@@ -2,11 +2,9 @@ package com.rbkmoney.deanonimus.util;
 
 import com.rbkmoney.damsel.domain.InternationalLegalEntity;
 import com.rbkmoney.damsel.domain.RussianLegalEntity;
-import com.rbkmoney.damsel.domain.RussianPrivateEntity;
 import com.rbkmoney.deanonimus.domain.Contractor;
 import com.rbkmoney.deanonimus.domain.ContractorType;
 import com.rbkmoney.deanonimus.domain.LegalEntity;
-import com.rbkmoney.deanonimus.domain.PrivateEntity;
 import com.rbkmoney.geck.common.util.TBaseUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -30,9 +28,6 @@ public class ContractorUtil {
                 contractor.setRussianLegalEntityInn(russianLegalEntity.getInn());
                 contractor.setRussianLegalEntityActualAddress(russianLegalEntity.getActualAddress());
                 contractor.setRussianLegalEntityPostAddress(russianLegalEntity.getPostAddress());
-                contractor.setRussianLegalEntityRepresentativePosition(russianLegalEntity.getRepresentativePosition());
-                contractor.setRussianLegalEntityRepresentativeFullName(russianLegalEntity.getRepresentativeFullName());
-                contractor.setRussianLegalEntityRepresentativeDocument(russianLegalEntity.getRepresentativeDocument());
                 contractor.setRussianLegalEntityRussianBankAccount(russianLegalEntity.getRussianBankAccount().getAccount());
                 contractor.setRussianLegalEntityRussianBankName(russianLegalEntity.getRussianBankAccount().getBankName());
                 contractor.setRussianLegalEntityRussianBankPostAccount(russianLegalEntity.getRussianBankAccount().getBankPostAccount());
@@ -44,16 +39,6 @@ public class ContractorUtil {
                 contractor.setInternationalLegalEntityRegisteredAddress(internationalLegalEntity.getRegisteredAddress());
                 contractor.setInternationalLegalEntityActualAddress(internationalLegalEntity.getActualAddress());
                 contractor.setInternationalLegalEntityRegisteredNumber(internationalLegalEntity.getRegisteredNumber());
-            }
-        } else if (contractorSource.isSetPrivateEntity()) {
-            contractor.setPrivateEntity(TBaseUtil.unionFieldToEnum(contractorSource.getPrivateEntity(), PrivateEntity.class));
-            if (contractorSource.getPrivateEntity().isSetRussianPrivateEntity()) {
-                RussianPrivateEntity russianPrivateEntity = contractorSource.getPrivateEntity().getRussianPrivateEntity();
-                contractor.setRussianPrivateEntityFirstName(russianPrivateEntity.getFirstName());
-                contractor.setRussianPrivateEntitySecondName(russianPrivateEntity.getSecondName());
-                contractor.setRussianPrivateEntityMiddleName(russianPrivateEntity.getMiddleName());
-                contractor.setRussianPrivateEntityPhoneNumber(russianPrivateEntity.getContactInfo().getPhoneNumber());
-                contractor.setRussianPrivateEntityEmail(russianPrivateEntity.getContactInfo().getEmail());
             }
         }
         return contractor;
