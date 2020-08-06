@@ -13,7 +13,7 @@ import static org.awaitility.Awaitility.await;
 public class WriteTest extends IntegrationTestBase {
 
     @Autowired
-    PartyRepository partyRepository;
+    private PartyRepository partyRepository;
 
     @Test
     public void onPartyCreatedElasticHaveIt() {

@@ -1,4 +1,4 @@
-package com.rbkmoney.deanonimus.kafka.handler.party_mngmnt.contractor;
+package com.rbkmoney.deanonimus.kafka.handler.party_management.contractor;
 
 import com.rbkmoney.damsel.domain.ContractorIdentificationLevel;
 import com.rbkmoney.damsel.payment_processing.ClaimEffect;
@@ -9,7 +9,7 @@ import com.rbkmoney.deanonimus.db.exception.ContractorNotFoundException;
 import com.rbkmoney.deanonimus.db.exception.PartyNotFoundException;
 import com.rbkmoney.deanonimus.domain.Contractor;
 import com.rbkmoney.deanonimus.domain.Party;
-import com.rbkmoney.deanonimus.kafka.handler.party_mngmnt.AbstractClaimChangedHandler;
+import com.rbkmoney.deanonimus.kafka.handler.party_management.AbstractClaimChangedHandler;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,8 +45,8 @@ public class ContractorIdentificationalLevelChangedHandler extends AbstractClaim
         String partyId = event.getSourceId();
         log.info("Start identificational level changed handling, sequenceId={}, partyId={}, contractorId={}", sequenceId, partyId, contractorId);
 
-        Party party = partyRepository.findById(partyId).orElseThrow(PartyNotFoundException::new);
-        Contractor contractor = party.getContractorById(contractorId).orElseThrow(ContractorNotFoundException::new);
+        Party party = partyRepository.findById(partyId).orElseThrow(() -> new PartyNotFoundException(partyId));
+        Contractor contractor = party.getContractorById(contractorId).orElseThrow(() -> new ContractorNotFoundException(contractorId));
 
         contractor.setIdentificationalLevel(identificationLevelChanged.name());
 

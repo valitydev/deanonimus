@@ -1,11 +1,11 @@
-package com.rbkmoney.deanonimus.kafka.handler.party_mngmnt.party;
+package com.rbkmoney.deanonimus.kafka.handler.party_management.party;
 
 import com.rbkmoney.damsel.domain.Blocking;
 import com.rbkmoney.damsel.payment_processing.PartyChange;
 import com.rbkmoney.deanonimus.db.PartyRepository;
 import com.rbkmoney.deanonimus.db.exception.PartyNotFoundException;
 import com.rbkmoney.deanonimus.domain.Party;
-import com.rbkmoney.deanonimus.kafka.handler.party_mngmnt.PartyManagementHandler;
+import com.rbkmoney.deanonimus.kafka.handler.party_management.PartyManagementHandler;
 import com.rbkmoney.geck.filter.Filter;
 import com.rbkmoney.geck.filter.PathConditionFilter;
 import com.rbkmoney.geck.filter.condition.IsNullCondition;
@@ -34,7 +34,7 @@ public class PartyBlockingHandler implements PartyManagementHandler {
         Blocking partyBlocking = change.getPartyBlocking();
         String partyId = event.getSourceId();
         log.info("Start party blocking handling, sequenceId={}, partyId={}, changeId={}", sequenceId, partyId, changeId);
-        Party partySource = partyRepository.findById(partyId).orElseThrow(PartyNotFoundException::new);
+        Party partySource = partyRepository.findById(partyId).orElseThrow(() -> new PartyNotFoundException(partyId));
 
         if (partyBlocking.isSetUnblocked()) {
             partySource.setBlocking(com.rbkmoney.deanonimus.domain.Blocking.unblocked);

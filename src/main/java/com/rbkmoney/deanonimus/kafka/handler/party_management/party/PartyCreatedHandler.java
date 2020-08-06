@@ -1,11 +1,12 @@
-package com.rbkmoney.deanonimus.kafka.handler.party_mngmnt.party;
+package com.rbkmoney.deanonimus.kafka.handler.party_management.party;
 
-import com.rbkmoney.damsel.domain.Suspension;
 import com.rbkmoney.damsel.payment_processing.PartyChange;
+import com.rbkmoney.damsel.payment_processing.PartyCreated;
 import com.rbkmoney.deanonimus.db.PartyRepository;
-import com.rbkmoney.deanonimus.db.exception.PartyNotFoundException;
+import com.rbkmoney.deanonimus.domain.Blocking;
 import com.rbkmoney.deanonimus.domain.Party;
-import com.rbkmoney.deanonimus.kafka.handler.party_mngmnt.PartyManagementHandler;
+import com.rbkmoney.deanonimus.domain.Suspension;
+import com.rbkmoney.deanonimus.kafka.handler.party_management.PartyManagementHandler;
 import com.rbkmoney.geck.filter.Filter;
 import com.rbkmoney.geck.filter.PathConditionFilter;
 import com.rbkmoney.geck.filter.condition.IsNullCondition;
@@ -20,31 +21,28 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class PartySuspensionHandler implements PartyManagementHandler {
-
-    private final Filter filter = new PathConditionFilter(new PathConditionRule(
-            "party_suspension",
-            new IsNullCondition().not()));
+public class PartyCreatedHandler implements PartyManagementHandler {
 
     private final PartyRepository partyRepository;
+    private final Filter filter = new PathConditionFilter(new PathConditionRule(
+            "party_created",
+            new IsNullCondition().not()));
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
     public void handle(PartyChange change, MachineEvent event, Integer changeId) {
         long sequenceId = event.getEventId();
-        Suspension partySuspension = change.getPartySuspension();
-        String partyId = event.getSourceId();
-        log.info("Start party suspension handling, eventId={}, partyId={}, changeId={}", sequenceId, partyId, changeId);
-        Party party = partyRepository.findById(partyId).orElseThrow(PartyNotFoundException::new);
-
-        if (partySuspension.isSetActive()) {
-            party.setSuspension(com.rbkmoney.deanonimus.domain.Suspension.active);
-        } else if (partySuspension.isSetSuspended()) {
-            party.setSuspension(com.rbkmoney.deanonimus.domain.Suspension.suspended);
-        }
+        PartyCreated partyCreated = change.getPartyCreated();
+        String partyId = partyCreated.getId();
+        log.info("Start party created handling, sequenceId={}, partyId={}, changeId={}", sequenceId, partyId, changeId);
+        Party party = new Party();
+        party.setId(partyId);
+        party.setEmail(partyCreated.getContactInfo().getEmail());
+        party.setBlocking(Blocking.unblocked);
+        party.setSuspension(Suspension.active);
 
         partyRepository.save(party);
-        log.info("End party suspension handling, eventId={}, partyId={}, changeId={}", sequenceId, partyId, changeId);
+        log.info("Party has been saved, sequenceId={}, partyId={}, changeId={}", sequenceId, partyId, changeId);
     }
 
     @Override

@@ -1,4 +1,4 @@
-package com.rbkmoney.deanonimus.kafka.handler.party_mngmnt.shop;
+package com.rbkmoney.deanonimus.kafka.handler.party_management.shop;
 
 
 import com.rbkmoney.damsel.payment_processing.ClaimEffect;
@@ -10,23 +10,19 @@ import com.rbkmoney.deanonimus.domain.Blocking;
 import com.rbkmoney.deanonimus.domain.Party;
 import com.rbkmoney.deanonimus.domain.Shop;
 import com.rbkmoney.deanonimus.domain.Suspension;
-import com.rbkmoney.deanonimus.kafka.handler.party_mngmnt.AbstractClaimChangedHandler;
+import com.rbkmoney.deanonimus.kafka.handler.party_management.AbstractClaimChangedHandler;
 import com.rbkmoney.deanonimus.util.ShopUtil;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static org.springframework.core.Ordered.HIGHEST_PRECEDENCE;
-
 @Slf4j
 @Component
-@Order(HIGHEST_PRECEDENCE)
 @RequiredArgsConstructor
 public class ShopCreatedHandler extends AbstractClaimChangedHandler {
 
@@ -52,7 +48,7 @@ public class ShopCreatedHandler extends AbstractClaimChangedHandler {
         log.info("Start shop created handling, sequenceId={}, partyId={}, shopId={}, changeId={}",
                 sequenceId, partyId, shopId, changeId);
 
-        Party party = partyRepository.findById(partyId).orElseThrow(PartyNotFoundException::new);
+        Party party = partyRepository.findById(partyId).orElseThrow(() -> new PartyNotFoundException(partyId));
 
         Shop shop = fillShopInfo(shopCreated, shopId);
 

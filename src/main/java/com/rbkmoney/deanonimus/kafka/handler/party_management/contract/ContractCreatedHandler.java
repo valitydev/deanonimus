@@ -1,4 +1,4 @@
-package com.rbkmoney.deanonimus.kafka.handler.party_mngmnt.contract;
+package com.rbkmoney.deanonimus.kafka.handler.party_management.contract;
 
 import com.rbkmoney.damsel.payment_processing.ClaimEffect;
 import com.rbkmoney.damsel.payment_processing.ContractEffectUnit;
@@ -8,14 +8,13 @@ import com.rbkmoney.deanonimus.db.exception.PartyNotFoundException;
 import com.rbkmoney.deanonimus.domain.Contract;
 import com.rbkmoney.deanonimus.domain.ContractStatus;
 import com.rbkmoney.deanonimus.domain.Party;
-import com.rbkmoney.deanonimus.kafka.handler.party_mngmnt.AbstractClaimChangedHandler;
+import com.rbkmoney.deanonimus.kafka.handler.party_management.AbstractClaimChangedHandler;
 import com.rbkmoney.deanonimus.util.ContractUtil;
 import com.rbkmoney.geck.common.util.TBaseUtil;
 import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,11 +22,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.UUID;
 
-import static org.springframework.core.Ordered.HIGHEST_PRECEDENCE;
-
 @Slf4j
 @Component
-@Order(HIGHEST_PRECEDENCE)
 @RequiredArgsConstructor
 public class ContractCreatedHandler extends AbstractClaimChangedHandler {
 
@@ -52,7 +48,7 @@ public class ContractCreatedHandler extends AbstractClaimChangedHandler {
         String partyId = event.getSourceId();
         log.info("Start contract created handling, sequenceId={}, partyId={}, contractId={}, changeId={}",
                 sequenceId, partyId, contractId, changeId);
-        Party party = partyRepository.findById(partyId).orElseThrow(PartyNotFoundException::new);
+        Party party = partyRepository.findById(partyId).orElseThrow(() -> new PartyNotFoundException(partyId));
 
         Contract contract = new Contract();
         contract.setId(contractId);

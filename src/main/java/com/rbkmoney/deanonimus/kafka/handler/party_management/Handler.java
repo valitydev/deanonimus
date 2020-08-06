@@ -1,4 +1,4 @@
-package com.rbkmoney.deanonimus.kafka.handler.party_mngmnt;
+package com.rbkmoney.deanonimus.kafka.handler.party_management;
 
 
 import com.rbkmoney.geck.filter.Filter;
@@ -11,10 +11,6 @@ public interface Handler<T, E> {
     }
 
     default void handle(T change, E event, Integer changeId) {
-        throw new NotImplementedException("Override it!");
-    }
-
-    default void handle(T change, E event) {
         throw new NotImplementedException("Override it!");
     }
 

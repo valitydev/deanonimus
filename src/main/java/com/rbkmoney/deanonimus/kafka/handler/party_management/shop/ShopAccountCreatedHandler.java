@@ -1,14 +1,15 @@
-package com.rbkmoney.deanonimus.kafka.handler.party_mngmnt.shop;
+package com.rbkmoney.deanonimus.kafka.handler.party_management.shop;
 
-import com.rbkmoney.damsel.domain.ShopDetails;
+import com.rbkmoney.damsel.domain.ShopAccount;
 import com.rbkmoney.damsel.payment_processing.ClaimEffect;
 import com.rbkmoney.damsel.payment_processing.PartyChange;
 import com.rbkmoney.damsel.payment_processing.ShopEffectUnit;
 import com.rbkmoney.deanonimus.db.PartyRepository;
 import com.rbkmoney.deanonimus.db.exception.PartyNotFoundException;
+import com.rbkmoney.deanonimus.db.exception.ShopNotFoundException;
 import com.rbkmoney.deanonimus.domain.Party;
-import com.rbkmoney.deanonimus.domain.Shop;
-import com.rbkmoney.deanonimus.kafka.handler.party_mngmnt.AbstractClaimChangedHandler;
+import com.rbkmoney.deanonimus.kafka.handler.party_management.AbstractClaimChangedHandler;
+import com.rbkmoney.deanonimus.util.ShopUtil;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +22,7 @@ import java.util.List;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class ShopDetailsChangedHandler extends AbstractClaimChangedHandler {
+public class ShopAccountCreatedHandler extends AbstractClaimChangedHandler {
 
     private final PartyRepository partyRepository;
 
@@ -31,7 +32,7 @@ public class ShopDetailsChangedHandler extends AbstractClaimChangedHandler {
         long sequenceId = event.getEventId();
         List<ClaimEffect> claimEffects = getClaimStatus(change).getAccepted().getEffects();
         for (ClaimEffect claimEffect : claimEffects) {
-            if (claimEffect.isSetShopEffect() && claimEffect.getShopEffect().getEffect().isSetDetailsChanged()) {
+            if (claimEffect.isSetShopEffect() && claimEffect.getShopEffect().getEffect().isSetAccountCreated()) {
                 handleEvent(event, changeId, sequenceId, claimEffect);
             }
         }
@@ -39,22 +40,20 @@ public class ShopDetailsChangedHandler extends AbstractClaimChangedHandler {
 
     private void handleEvent(MachineEvent event, Integer changeId, long sequenceId, ClaimEffect e) {
         ShopEffectUnit shopEffect = e.getShopEffect();
-        ShopDetails detailsChanged = shopEffect.getEffect().getDetailsChanged();
+        ShopAccount accountCreated = shopEffect.getEffect().getAccountCreated();
         String shopId = shopEffect.getShopId();
         String partyId = event.getSourceId();
-        log.info("Start shop detailsChanged handling, sequenceId={}, partyId={}, shopId={}, changeId={}",
+        log.info("Start shop accountCreated handling, sequenceId={}, partyId={}, shopId={}, changeId={}",
                 sequenceId, partyId, shopId, changeId);
 
-        Party party = partyRepository.findById(partyId).orElseThrow(PartyNotFoundException::new);
+        Party party = partyRepository.findById(partyId).orElseThrow(() -> new PartyNotFoundException(partyId));
 
-        Shop shop = party.getShops().get(0);
-
-        shop.setDetailsName(detailsChanged.getName());
-        shop.setDetailsDescription(detailsChanged.getDescription());
+        ShopUtil.fillShopAccount(party.getShopById(shopId).orElseThrow(() -> new ShopNotFoundException(shopId)), accountCreated);
 
         partyRepository.save(party);
 
-        log.info("End shop detailsChanged handling, sequenceId={}, partyId={}, shopId={}, changeId={}",
+        log.info("End shop accountCreated handling, sequenceId={}, partyId={}, shopId={}, changeId={}",
                 sequenceId, partyId, shopId, changeId);
     }
+
 }

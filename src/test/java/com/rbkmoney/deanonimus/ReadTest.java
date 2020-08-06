@@ -7,7 +7,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 import org.springframework.data.elasticsearch.core.SearchHits;
 
 public class ReadTest extends IntegrationTestBase {
@@ -16,19 +15,16 @@ public class ReadTest extends IntegrationTestBase {
     PartyRepository partyRepository;
 
     @Autowired
-    ElasticsearchRestTemplate elasticsearchRestTemplate;
-
-    @Autowired
     SearchDao searchDao;
 
-    public static final String PARTY = "party";
-    public static final String SHOP = "shop";
-    public static final String EMAIL = "email@mail.com";
-    public static final String URL = "http://url.com";
-    public static final String CONTRACT = "contract";
-    public static final String CONTRACTOR = "contractor";
-    public static final String INN = "1234234123";
-    public static final String ACCOUNT = "9999999999";
+    private static final String PARTY = "party";
+    private static final String SHOP = "shop";
+    private static final String EMAIL = "email@mail.com";
+    private static final String URL = "http://url.com";
+    private static final String CONTRACT = "contract";
+    private static final String CONTRACTOR = "contractor";
+    private static final String INN = "1234234123";
+    private static final String ACCOUNT = "9999999999";
 
     @Before
     public void cleanup() {

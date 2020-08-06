@@ -1,12 +1,13 @@
-package com.rbkmoney.deanonimus.kafka.handler.party_mngmnt.shop;
+package com.rbkmoney.deanonimus.kafka.handler.party_management.shop;
 
-import com.rbkmoney.damsel.domain.Suspension;
+import com.rbkmoney.damsel.domain.Blocking;
 import com.rbkmoney.damsel.payment_processing.PartyChange;
 import com.rbkmoney.deanonimus.db.PartyRepository;
 import com.rbkmoney.deanonimus.db.exception.PartyNotFoundException;
+import com.rbkmoney.deanonimus.db.exception.ShopNotFoundException;
 import com.rbkmoney.deanonimus.domain.Party;
 import com.rbkmoney.deanonimus.domain.Shop;
-import com.rbkmoney.deanonimus.kafka.handler.party_mngmnt.PartyManagementHandler;
+import com.rbkmoney.deanonimus.kafka.handler.party_management.PartyManagementHandler;
 import com.rbkmoney.geck.filter.Filter;
 import com.rbkmoney.geck.filter.PathConditionFilter;
 import com.rbkmoney.geck.filter.condition.IsNullCondition;
@@ -21,36 +22,39 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class ShopSuspensionHandler implements PartyManagementHandler {
+public class ShopBlockingHandler implements PartyManagementHandler {
 
     private final PartyRepository partyRepository;
     private final Filter filter = new PathConditionFilter(new PathConditionRule(
-            "shop_suspension",
+            "shop_blocking",
             new IsNullCondition().not()));
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
     public void handle(PartyChange change, MachineEvent event, Integer changeId) {
         long sequenceId = event.getEventId();
-        Suspension suspension = change.getShopSuspension().getSuspension();
-        String shopId = change.getShopSuspension().getShopId();
+        Blocking blocking = change.getShopBlocking().getBlocking();
+        String shopId = change.getShopBlocking().getShopId();
         String partyId = event.getSourceId();
-        log.info("Start shop suspension handling, sequenceId={}, partyId={}, shopId={}, changeId={}",
+        log.info("Start shop blocking handling, sequenceId={}, partyId={}, shopId={}, changeId={}",
                 sequenceId, partyId, shopId, changeId);
 
-        Party party = partyRepository.findById(partyId).orElseThrow(PartyNotFoundException::new);
-        Shop shop = party.getShops().get(0);
+        Party party = partyRepository.findById(partyId).orElseThrow(() -> new PartyNotFoundException(partyId));
 
-        if (suspension.isSetActive()) {
-            shop.setSuspension(com.rbkmoney.deanonimus.domain.Suspension.active);
-        } else if (suspension.isSetSuspended()) {
-            shop.setSuspension(com.rbkmoney.deanonimus.domain.Suspension.suspended);
-        }
+        initBlockingFields(blocking, party.getShopById(shopId).orElseThrow(() -> new ShopNotFoundException(shopId)));
 
         partyRepository.save(party);
 
-        log.info("End shop suspension handling, sequenceId={}, partyId={}, shopId={}, changeId={}",
+        log.info("End shop blocking handling, sequenceId={}, partyId={}, shopId={}, changeId={}",
                 sequenceId, partyId, shopId, changeId);
+    }
+
+    private void initBlockingFields(Blocking blocking, Shop shopSource) {
+        if (blocking.isSetUnblocked()) {
+            shopSource.setBlocking(com.rbkmoney.deanonimus.domain.Blocking.unblocked);
+        } else if (blocking.isSetBlocked()) {
+            shopSource.setBlocking(com.rbkmoney.deanonimus.domain.Blocking.blocked);
+        }
     }
 
     @Override

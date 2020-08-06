@@ -34,7 +34,7 @@ public class TestData {
             new String[]{"created_at", "at", "due"}
     );
 
-    private static MockTBaseProcessor mockTBaseProcessor = new MockTBaseProcessor(MockMode.ALL, 15, 1);
+    private static final MockTBaseProcessor mockTBaseProcessor = new MockTBaseProcessor(MockMode.ALL, 15, 1);
 
     static {
         mockTBaseProcessor.addFieldHandler(timeFields.getKey(), timeFields.getValue());

@@ -68,7 +68,7 @@ public abstract class IntegrationTestBase {
     private static Producer<String, SinkEvent> createProducer() {
         final Map<String, Object> configs = KafkaTestUtils.producerProps(kafka.getBootstrapServers());
         configs.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        configs.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, new ThriftSerializer<SinkEvent>().getClass());
+        configs.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, ThriftSerializer.class);
         return new KafkaProducer<>(configs);
     }
 
