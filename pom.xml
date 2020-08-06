@@ -26,6 +26,7 @@
         <dockerfile.registry>${env.REGISTRY}</dockerfile.registry>
         <shared.resources.version>0.3.6</shared.resources.version>
         <sonar.jacoco.reportPaths>${project.basedir}/target/jacoco.exec</sonar.jacoco.reportPaths>
+        <damsel.version>1.446-38bdfd5</damsel.version>
     </properties>
 
     <dependencies>
@@ -68,7 +69,7 @@
         <dependency>
             <groupId>com.rbkmoney</groupId>
             <artifactId>damsel</artifactId>
-            <version>1.446-38bdfd5</version>
+            <version>${damsel.version}</version>
         </dependency>
         <dependency>
             <groupId>com.rbkmoney.geck</groupId>
