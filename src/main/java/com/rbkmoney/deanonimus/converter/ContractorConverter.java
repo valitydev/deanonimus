@@ -48,7 +48,7 @@ public class ContractorConverter {
                         .setTradingName(contractor.getInternationalLegalEntityTradingName())
                         .setRegisteredAddress(contractor.getInternationalLegalEntityRegisteredAddress())
                         .setActualAddress(contractor.getInternationalLegalEntityActualAddress())
-                        .setRegisteredNumber(contractor.getInternationalLegalEntityRegisteredNumber())
+                        .setRegisteredNumber(contractor.getInternationalLegalEntityRegisteredNumber());
                 return LegalEntity.international_legal_entity(internationalLegalEntity);
             case russian_legal_entity:
                 RussianLegalEntity russianLegalEntity = new RussianLegalEntity()
