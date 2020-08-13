@@ -1,13 +1,16 @@
 package com.rbkmoney.deanonimus;
 
+import com.rbkmoney.damsel.deanonimus.SearchHit;
 import com.rbkmoney.deanonimus.db.PartyRepository;
-import com.rbkmoney.deanonimus.db.SearchDao;
 import com.rbkmoney.deanonimus.domain.Party;
+import com.rbkmoney.deanonimus.handler.DeanonimusServiceHandler;
+import org.apache.thrift.TException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.elasticsearch.core.SearchHits;
+
+import java.util.List;
 
 public class ReadTest extends IntegrationTestBase {
 
@@ -15,7 +18,7 @@ public class ReadTest extends IntegrationTestBase {
     PartyRepository partyRepository;
 
     @Autowired
-    SearchDao searchDao;
+    DeanonimusServiceHandler deanonimusServiceHandler;
 
     private static final String PARTY = "party";
     private static final String SHOP = "shop";
@@ -32,165 +35,177 @@ public class ReadTest extends IntegrationTestBase {
     }
 
     @Test
-    public void searchByPartyEmail() {
+    public void searchByPartyEmail() throws TException {
         givenParty(PARTY, EMAIL);
 
-        SearchHits<Party> searchHits = searchDao.searchParty(EMAIL);
+        List<SearchHit> searchHits = deanonimusServiceHandler.searchParty(EMAIL);
 
-        Assert.assertTrue(searchHits.hasSearchHits());
-        Assert.assertTrue(searchHits.get()
-                .anyMatch(partySearchHit -> partySearchHit.getContent().getEmail().contains(EMAIL)));
+        Assert.assertFalse(searchHits.isEmpty());
+        Assert.assertTrue(searchHits.stream()
+                .anyMatch(partySearchHit -> partySearchHit.getParty().getEmail().contains(EMAIL)));
     }
 
     @Test
-    public void searchByShopUrl() {
+    public void searchByShopUrl() throws TException {
         Party party = givenParty(PARTY, EMAIL);
         givenShop(party, SHOP, URL);
 
-        SearchHits<Party> searchHits = searchDao.searchParty(URL);
+        List<SearchHit> searchHits = deanonimusServiceHandler.searchParty(URL);
 
-        Assert.assertTrue(searchHits.hasSearchHits());
-        Assert.assertTrue(searchHits.get()
-                .anyMatch(partySearchHit -> partySearchHit.getContent().getShops().stream()
-                        .anyMatch(shop -> shop.getLocationUrl().contains(URL))));
+        Assert.assertFalse(searchHits.isEmpty());
+        Assert.assertTrue(searchHits.stream()
+                .anyMatch(partySearchHit -> partySearchHit.getParty().getShops().values().stream()
+                        .anyMatch(shop -> shop.getLocation().getUrl().contains(URL))));
     }
 
     @Test
-    public void searchByShopId() {
+    public void searchByShopId() throws TException {
         Party party = givenParty(PARTY, EMAIL);
         givenShop(party, SHOP, URL);
 
-        SearchHits<Party> searchHits = searchDao.searchParty(SHOP);
+        List<SearchHit> searchHits = deanonimusServiceHandler.searchParty(SHOP);
 
-        Assert.assertTrue(searchHits.hasSearchHits());
-        Assert.assertTrue(searchHits.get()
-                .anyMatch(partySearchHit -> partySearchHit.getContent().getShops().stream()
+        Assert.assertFalse(searchHits.isEmpty());
+        Assert.assertTrue(searchHits.stream()
+                .anyMatch(partySearchHit -> partySearchHit.getParty().getShops().values().stream()
                         .anyMatch(shop -> shop.getId().equals(SHOP))));
     }
 
     @Test
-    public void searchByContractorEmail() {
+    public void searchByContractorEmail() throws TException {
         Party party = givenParty(PARTY, null);
-        givenRussianContractor(party, CONTRACTOR, EMAIL, "ООО \"ЧИ ИЛИ НЕ ЧИ\"", INN, ACCOUNT);
+        givenRegisteredUserContractor(party, CONTRACTOR, EMAIL);
 
 
-        SearchHits<Party> searchHits = searchDao.searchParty(EMAIL);
+        List<SearchHit> searchHits = deanonimusServiceHandler.searchParty(EMAIL);
 
-        Assert.assertTrue(searchHits.hasSearchHits());
-        Assert.assertTrue(searchHits.get()
-                .anyMatch(partySearchHit -> partySearchHit.getContent().getContractorById(CONTRACTOR).orElseThrow().getRegisteredUserEmail().contains(EMAIL)));
+        Assert.assertFalse(searchHits.isEmpty());
+        Assert.assertTrue(searchHits.stream()
+                .anyMatch(partySearchHit -> partySearchHit.getParty().getContractors().get(CONTRACTOR).getContractor().getRegisteredUser().getEmail().contains(EMAIL)));
     }
 
     @Test
-    public void searchByContractorRussianLegalEntityRegisteredNameWithOneWord() {
+    public void searchByContractorRussianLegalEntityRegisteredNameWithOneWord() throws TException {
         Party party = givenParty(PARTY, null);
-        givenRussianContractor(party, CONTRACTOR, EMAIL, "ООО \"ЧИ ИЛИ НЕ ЧИ\"", INN, ACCOUNT);
+        givenRussianContractor(party, CONTRACTOR, "ООО \"ЧИ ИЛИ НЕ ЧИ\"", INN, ACCOUNT);
 
 
-        SearchHits<Party> searchHits = searchDao.searchParty("ЧИ");
+        List<SearchHit> searchHits = deanonimusServiceHandler.searchParty("ЧИ");
 
-        Assert.assertTrue(searchHits.hasSearchHits());
-        Assert.assertTrue(searchHits.get()
-                .anyMatch(partySearchHit -> partySearchHit.getContent().getContractorById(CONTRACTOR).orElseThrow().getRussianLegalEntityRegisteredName().contains("ЧИ")));
+        Assert.assertFalse(searchHits.isEmpty());
+        Assert.assertTrue(searchHits.stream()
+                .anyMatch(partySearchHit -> partySearchHit.getParty().getContractors().get(CONTRACTOR).getContractor().getLegalEntity().getRussianLegalEntity().getRegisteredName().contains("ЧИ")));
     }
 
     @Test
-    public void searchByContractorRussianLegalEntityRegisteredNameWithOneMatchingAndOneNotMatchingWord() {
+    public void searchByContractorRussianLegalEntityRegisteredNameWithOneMatchingAndOneNotMatchingWord() throws TException {
         Party party = givenParty(PARTY, null);
-        givenRussianContractor(party, CONTRACTOR, EMAIL, "ООО \"ЧИ ИЛИ НЕ ЧИ\"", INN, ACCOUNT);
+        givenRussianContractor(party, CONTRACTOR, "ООО \"ЧИ ИЛИ НЕ ЧИ\"", INN, ACCOUNT);
 
 
-        SearchHits<Party> searchHits = searchDao.searchParty("ЧИ ДА");
+        List<SearchHit> searchHits = deanonimusServiceHandler.searchParty("ЧИ ДА");
 
-        Assert.assertTrue(searchHits.hasSearchHits());
-        Assert.assertTrue(searchHits.get()
-                .anyMatch(partySearchHit -> partySearchHit.getContent().getContractorById(CONTRACTOR).orElseThrow().getRussianLegalEntityRegisteredName().contains("ЧИ")));
+        Assert.assertFalse(searchHits.isEmpty());
+        Assert.assertTrue(searchHits.stream()
+                .anyMatch(partySearchHit -> partySearchHit.getParty().getContractors().get(CONTRACTOR).getContractor().getLegalEntity().getRussianLegalEntity().getRegisteredName().contains("ЧИ")));
     }
 
     @Test
-    public void searchByContractorRussianLegalEntityRegisteredNameNoMatchingWords() {
+    public void searchByContractorRussianLegalEntityRegisteredNameNoMatchingWords() throws TException {
         Party party = givenParty(PARTY, null);
-        givenRussianContractor(party, CONTRACTOR, EMAIL, "ООО \"ЧИ ИЛИ НЕ ЧИ\"", INN, ACCOUNT);
+        givenRussianContractor(party, CONTRACTOR, "ООО \"ЧИ ИЛИ НЕ ЧИ\"", INN, ACCOUNT);
 
 
-        SearchHits<Party> searchHits = searchDao.searchParty("ДА");
+        List<SearchHit> searchHits = deanonimusServiceHandler.searchParty("ДА");
 
-        Assert.assertFalse(searchHits.hasSearchHits());
+        Assert.assertTrue(searchHits.isEmpty());
     }
 
     @Test
-    public void searchByContractorInnFullyEqual() {
+    public void searchByContractorInnFullyEqual() throws TException {
         Party party = givenParty(PARTY, null);
-        givenRussianContractor(party, CONTRACTOR, EMAIL, "ООО \"ЧИ ИЛИ НЕ ЧИ\"", INN, ACCOUNT);
+        givenRussianContractor(party, CONTRACTOR, "ООО \"ЧИ ИЛИ НЕ ЧИ\"", INN, ACCOUNT);
 
 
-        SearchHits<Party> searchHits = searchDao.searchParty(INN);
+        List<SearchHit> searchHits = deanonimusServiceHandler.searchParty(INN);
 
-        Assert.assertTrue(searchHits.hasSearchHits());
-        Assert.assertTrue(searchHits.get()
-                .anyMatch(partySearchHit -> partySearchHit.getContent().getContractorById(CONTRACTOR).orElseThrow().getRussianLegalEntityInn().equals(INN)));
+        Assert.assertFalse(searchHits.isEmpty());
+        Assert.assertTrue(searchHits.stream()
+                .anyMatch(partySearchHit -> partySearchHit.getParty().getContractors().get(CONTRACTOR).getContractor().getLegalEntity().getRussianLegalEntity().getInn().equals(INN)));
     }
 
 
     @Test
-    public void searchByContractorInnNotFullyEqual() {
+    public void searchByContractorInnNotFullyEqual() throws TException {
         Party party = givenParty(PARTY, null);
-        givenRussianContractor(party, CONTRACTOR, EMAIL, "ООО \"ЧИ ИЛИ НЕ ЧИ\"", INN, ACCOUNT);
+        givenRussianContractor(party, CONTRACTOR, "ООО \"ЧИ ИЛИ НЕ ЧИ\"", INN, ACCOUNT);
 
 
-        SearchHits<Party> searchHits = searchDao.searchParty(INN.substring(0, 6));
+        List<SearchHit> searchHits = deanonimusServiceHandler.searchParty(INN.substring(0, 6));
 
-        Assert.assertFalse(searchHits.hasSearchHits());
+        Assert.assertTrue(searchHits.isEmpty());
     }
 
     @Test
-    public void searchByContractorInternationalLegalEntityLegalName() {
+    public void searchByContractorInternationalLegalEntityLegalName() throws TException {
         Party party = givenParty(PARTY, null);
-        givenInternationalContractor(party, CONTRACTOR, EMAIL, "SoMe LeGaL NaMe","ANOTHER TRADING NAME");
+        givenInternationalContractor(party, CONTRACTOR, "SoMe LeGaL NaMe","ANOTHER TRADING NAME");
 
 
-        SearchHits<Party> searchHits = searchDao.searchParty("legal");
+        List<SearchHit> searchHits = deanonimusServiceHandler.searchParty("legal");
 
-        Assert.assertTrue(searchHits.hasSearchHits());
-        Assert.assertTrue(searchHits.get()
-                .anyMatch(partySearchHit -> partySearchHit.getContent().getContractorById(CONTRACTOR).orElseThrow().getInternationalLegalEntityLegalName().equals("SoMe LeGaL NaMe")));
+        Assert.assertFalse(searchHits.isEmpty());
+        Assert.assertTrue(searchHits.stream()
+                .anyMatch(partySearchHit -> partySearchHit.getParty().getContractors().get(CONTRACTOR).getContractor().getLegalEntity().getInternationalLegalEntity().getLegalName().equals("SoMe LeGaL NaMe")));
     }
 
     @Test
-    public void searchByContractLegalAgreementId() {
+    public void searchByContractLegalAgreementId() throws TException {
         Party party = givenParty(PARTY, null);
         givenContract(party, CONTRACT, 123, "ДГ-123432", "Василий Пупкин");
 
 
-        SearchHits<Party> searchHits = searchDao.searchParty("ДГ");
+        List<SearchHit> searchHits = deanonimusServiceHandler.searchParty("ДГ");
 
-        Assert.assertTrue(searchHits.hasSearchHits());
-        Assert.assertTrue(searchHits.get()
-                .anyMatch(partySearchHit -> partySearchHit.getContent().getContractById(CONTRACT).orElseThrow().getLegalAgreementId().equals("ДГ-123432")));
+        Assert.assertFalse(searchHits.isEmpty());
+        Assert.assertTrue(searchHits.stream()
+                .anyMatch(partySearchHit -> partySearchHit.getParty().getContracts().get(CONTRACT).getLegalAgreement().getId().equals("ДГ-123432")));
     }
 
     @Test
-    public void searchForSeveralParties() {
+    public void searchForSeveralParties() throws TException {
         for (int i = 0; i < 10; i++) {
             Party party = givenParty(i + "", i + EMAIL.substring(EMAIL.indexOf("@")));
             givenShop(party, 9 - i + "", URL + i);
         }
 
-        SearchHits<Party> searchHits = searchDao.searchParty("1");
+        List<SearchHit> searchHits = deanonimusServiceHandler.searchParty("1");
 
-        Assert.assertEquals(2, searchHits.getTotalHits());
-        Assert.assertEquals("1", searchHits.getSearchHit(0).getContent().getId());
-        Assert.assertTrue(searchHits.getSearchHit(1).getContent().getShopById("1").isPresent());
+        Assert.assertEquals(2, searchHits.size());
+        Assert.assertEquals("1", searchHits.get(0).getParty().getId());
+        Assert.assertNotNull(searchHits.get(1).getParty().getShops().get("1"));
+    }
+
+    private void givenRegisteredUserContractor(Party party,
+                                        String id,
+                                        String registeredUserEmail) {
+        party.addContractor(TestData.contractor(id,
+                registeredUserEmail,
+                null,
+                null,
+                null,
+                null,
+                null));
+        partyRepository.save(party);
     }
 
     private void givenRussianContractor(Party party,
                                         String id,
-                                        String registeredUserEmail,
                                         String russianLegalEntityRegisteredName,
                                         String russianLegalEntityRegisteredInn,
                                         String russianLegalEntityRussianBankAccount) {
         party.addContractor(TestData.contractor(id,
-                registeredUserEmail,
+                null,
                 russianLegalEntityRegisteredName,
                 russianLegalEntityRegisteredInn,
                 russianLegalEntityRussianBankAccount,
@@ -210,11 +225,10 @@ public class ReadTest extends IntegrationTestBase {
 
     private void givenInternationalContractor(Party party,
                                               String id,
-                                              String registeredUserEmail,
                                               String internationalLegalEntityLegalName,
                                               String internationalLegalEntityTradingName) {
         party.addContractor(TestData.contractor(id,
-                registeredUserEmail,
+                null,
                 null,
                 null,
                 null,

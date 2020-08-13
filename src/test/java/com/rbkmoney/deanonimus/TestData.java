@@ -6,6 +6,10 @@ import com.rbkmoney.damsel.domain.PartyContactInfo;
 import com.rbkmoney.damsel.payment_processing.EventPayload;
 import com.rbkmoney.damsel.payment_processing.PartyChange;
 import com.rbkmoney.damsel.payment_processing.PartyCreated;
+import com.rbkmoney.deanonimus.domain.ContractStatus;
+import com.rbkmoney.deanonimus.domain.ContractorType;
+import com.rbkmoney.deanonimus.domain.LegalEntity;
+import com.rbkmoney.deanonimus.domain.Suspension;
 import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.geck.serializer.kit.mock.FieldHandler;
 import com.rbkmoney.geck.serializer.kit.mock.MockMode;
@@ -105,6 +109,11 @@ public class TestData {
         return com.rbkmoney.deanonimus.domain.Shop.builder()
                 .id(id)
                 .locationUrl(url)
+                .blocking(com.rbkmoney.deanonimus.domain.Blocking.unblocked)
+                .suspension(Suspension.active)
+                .categoryId(1)
+                .contractId("1")
+                .detailsName("name")
                 .build();
     }
 
@@ -114,6 +123,7 @@ public class TestData {
                                                                    String reportActSignerFullName) {
         return com.rbkmoney.deanonimus.domain.Contract.builder()
                 .id(id)
+                .status(ContractStatus.active)
                 .termsId(termsId)
                 .legalAgreementId(legalAgreementId)
                 .reportActSignerFullName(reportActSignerFullName)
@@ -129,6 +139,8 @@ public class TestData {
                                                                        String internationalLegalEntityTradingName) {
         return com.rbkmoney.deanonimus.domain.Contractor.builder()
                 .id(id)
+                .type(getContractorType(registeredUserEmail, russianLegalEntityRegisteredInn, internationalLegalEntityLegalName))
+                .legalEntity(getLegalEntity(russianLegalEntityRegisteredInn, internationalLegalEntityLegalName))
                 .registeredUserEmail(registeredUserEmail)
                 .russianLegalEntityRegisteredName(russianLegalEntityRegisteredName)
                 .russianLegalEntityRussianBankAccount(russianLegalEntityRussianBankAccount)
@@ -138,10 +150,34 @@ public class TestData {
                 .build();
     }
 
+    private static ContractorType getContractorType(String registeredUserEmail,
+                                                    String russianLegalEntityRegisteredInn,
+                                                    String internationalLegalEntityLegalName) {
+        if (registeredUserEmail != null) {
+            return ContractorType.registered_user;
+        }
+        if (russianLegalEntityRegisteredInn != null || internationalLegalEntityLegalName != null) {
+            return ContractorType.legal_entity;
+        }
+        return null;
+    }
+
+    private static LegalEntity getLegalEntity(String russianLegalEntityRegisteredInn, String internationalLegalEntityLegalName) {
+        if (russianLegalEntityRegisteredInn != null) {
+            return LegalEntity.russian_legal_entity;
+        }
+        if (internationalLegalEntityLegalName != null) {
+            return LegalEntity.international_legal_entity;
+        }
+        return null;
+    }
+
     public static com.rbkmoney.deanonimus.domain.Party party(String id, String email) {
         return com.rbkmoney.deanonimus.domain.Party.builder()
                 .id(id)
                 .email(email)
+                .blocking(com.rbkmoney.deanonimus.domain.Blocking.unblocked)
+                .suspension(Suspension.active)
                 .build();
     }
 }
