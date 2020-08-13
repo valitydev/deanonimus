@@ -25,11 +25,6 @@ public class Contract {
     private Integer termsId;
     @Field(type = FieldType.Text, analyzer = "autocomplete", searchAnalyzer = "standard")
     private String legalAgreementId;
-    private Integer reportActScheduleId;
-    private String reportActSignerPosition;
     @Field(type = FieldType.Text, analyzer = "autocomplete", searchAnalyzer = "standard")
     private String reportActSignerFullName;
-    private RepresentativeDocument reportActSignerDocument;
-    private String reportActSignerDocPowerOfAttorneyLegalAgreementId;
-    private LocalDateTime reportActSignerDocPowerOfAttorneyValidUntil;
 }

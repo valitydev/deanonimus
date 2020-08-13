@@ -12,10 +12,10 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Contractor {
+    @Field(type = FieldType.Keyword)
     private String id;
     private String partyId;
     private ContractorType type;
-    private String identificationalLevel;
     @Field(type = FieldType.Text, analyzer = "autocomplete", searchAnalyzer = "standard")
     private String registeredUserEmail;
     private LegalEntity legalEntity;

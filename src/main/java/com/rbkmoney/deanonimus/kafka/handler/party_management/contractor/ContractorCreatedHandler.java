@@ -46,7 +46,6 @@ public class ContractorCreatedHandler extends AbstractClaimChangedHandler {
         log.info("Start contractor created handling, eventId={}, partyId={}, contractorId={}", eventId, partyId, contractorId);
         Party party = partyRepository.findById(partyId).orElseThrow(() -> new PartyNotFoundException(partyId));
         com.rbkmoney.deanonimus.domain.Contractor contractor = ContractorUtil.convertContractor(partyId, contractorCreated, contractorId);
-        contractor.setIdentificationalLevel(partyContractor.getStatus().name());
 
         party.addContractor(contractor);
 
