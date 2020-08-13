@@ -169,7 +169,7 @@ public class ReadTest extends IntegrationTestBase {
 
         Assert.assertFalse(searchHits.isEmpty());
         Assert.assertTrue(searchHits.stream()
-                .anyMatch(partySearchHit -> partySearchHit.getParty().getContracts().get(CONTRACT).getLegalAgreement().getLegalAgreementId().equals("ДГ-123432")));
+                .anyMatch(partySearchHit -> partySearchHit.getParty().getContracts().get(CONTRACT).getLegalAgreement().getId().equals("ДГ-123432")));
     }
 
     @Test

@@ -79,7 +79,7 @@
         <dependency>
             <groupId>com.rbkmoney</groupId>
             <artifactId>deanonimus-proto</artifactId>
-            <version>1.11-7cc0668</version>
+            <version>1.16-c0bbabe</version>
         </dependency>
         <!--spring-->
         <dependency>

@@ -11,7 +11,7 @@ public class EnumUtils {
             case unblocked:
                 return Blocking.unblocked(new Unblocked());
             default:
-                throw new RuntimeException("No such blocking state");
+                throw new IllegalArgumentException("No such blocking state " + blocking);
         }
     }
 
@@ -22,7 +22,7 @@ public class EnumUtils {
             case suspended:
                 return Suspension.suspended(new Suspended());
             default:
-                throw new RuntimeException("No such suspension state");
+                throw new IllegalArgumentException("No such suspension state " + suspension);
         }
     }
 }
