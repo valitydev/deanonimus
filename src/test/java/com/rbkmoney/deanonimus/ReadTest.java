@@ -9,10 +9,14 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.List;
 
 public class ReadTest extends IntegrationTestBase {
+
+    @Value("${data.response.limit}")
+    Integer responseLimit;
 
     @Autowired
     PartyRepository partyRepository;
@@ -184,6 +188,18 @@ public class ReadTest extends IntegrationTestBase {
         Assert.assertEquals(2, searchHits.size());
         Assert.assertEquals("1", searchHits.get(0).getParty().getId());
         Assert.assertNotNull(searchHits.get(1).getParty().getShops().get("1"));
+    }
+
+    @Test
+    public void responseLimitApplied() throws TException {
+        for (int i = 0; i < 30; i++) {
+            Party party = givenParty(i + "", EMAIL);
+            givenShop(party, 29 - i + "", URL + i);
+        }
+
+        List<SearchHit> searchHits = deanonimusServiceHandler.searchParty("email");
+
+        Assert.assertEquals((long) responseLimit, searchHits.size());
     }
 
     private void givenRegisteredUserContractor(Party party,

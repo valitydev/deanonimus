@@ -1,7 +1,7 @@
 package com.rbkmoney.deanonimus.kafka.handler;
 
-import com.rbkmoney.damsel.payment_processing.EventPayload;
 import com.rbkmoney.damsel.payment_processing.PartyChange;
+import com.rbkmoney.damsel.payment_processing.PartyEventData;
 import com.rbkmoney.deanonimus.kafka.handler.party_management.PartyManagementHandler;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import com.rbkmoney.sink.common.parser.impl.MachineEventParser;
@@ -19,7 +19,7 @@ import java.util.List;
 public class PartyManagementHandlerService {
 
     private final List<PartyManagementHandler> partyManagementHandlers;
-    private final MachineEventParser<EventPayload> parser;
+    private final MachineEventParser<PartyEventData> parser;
 
     @Transactional(propagation = Propagation.REQUIRED)
     public void handleEvents(List<MachineEvent> machineEvents) {
@@ -27,17 +27,16 @@ public class PartyManagementHandlerService {
     }
 
     private void handleIfAccept(MachineEvent machineEvent) {
-        EventPayload eventPayload = parser.parse(machineEvent);
-        if (eventPayload.isSetPartyChanges()) {
-            final List<PartyChange> partyChanges = eventPayload.getPartyChanges();
-            for (int i = 0; i < partyChanges.size(); i++) {
-                PartyChange partyChange = partyChanges.get(i);
-                Integer changeId = i;
-                partyManagementHandlers.stream()
-                        .filter(handler -> handler.accept(partyChange))
-                        .forEach(handler -> handler.handle(partyChange, machineEvent, changeId));
-            }
+        PartyEventData eventPayload = parser.parse(machineEvent);
+        final List<PartyChange> partyChanges = eventPayload.getChanges();
+        for (int i = 0; i < partyChanges.size(); i++) {
+            PartyChange partyChange = partyChanges.get(i);
+            Integer changeId = i;
+            partyManagementHandlers.stream()
+                    .filter(handler -> handler.accept(partyChange))
+                    .forEach(handler -> handler.handle(partyChange, machineEvent, changeId));
         }
+
     }
 
 }

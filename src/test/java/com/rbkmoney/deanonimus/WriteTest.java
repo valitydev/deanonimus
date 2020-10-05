@@ -6,8 +6,10 @@ import com.rbkmoney.deanonimus.domain.Blocking;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.io.IOException;
 import java.util.List;
 
+import static com.rbkmoney.deanonimus.PartyFlowGenerator.*;
 import static org.awaitility.Awaitility.await;
 
 public class WriteTest extends IntegrationTestBase {
@@ -16,9 +18,9 @@ public class WriteTest extends IntegrationTestBase {
     private PartyRepository partyRepository;
 
     @Test
-    public void onPartyCreatedElasticHaveIt() {
+    public void onPartyCreatedElasticHaveIt() throws IOException {
 
-        sendMessage(TestData.createSinkEvent(TestData.SOURCE_ID_ONE, TestData.partyCreated()));
+        sendMessages(generatePartyContractorFlow(TestData.SOURCE_ID_ONE));
 
         await().until(() -> partyRepository.findById(TestData.SOURCE_ID_ONE),
                 partyOptional -> partyOptional.isPresent() && partyOptional.get().getId().equals(TestData.SOURCE_ID_ONE)
@@ -28,11 +30,12 @@ public class WriteTest extends IntegrationTestBase {
 
     @Test
     public void onPartyBlockingPartyChanges() {
-        sendMessages(TestData.createSinkEvents(TestData.SOURCE_ID_ONE,
+        sendMessages(
                 List.of(
-                        TestData.partyCreated(),
-                        TestData.partyBlocked())
-        ));
+                        buildSinkEvent(buildMessagePartyCreated(0L, TestData.SOURCE_ID_ONE)),
+                        buildSinkEvent(buildMessagePartyBlocking(0L, TestData.SOURCE_ID_ONE))
+                )
+        );
 
         await().until(() -> partyRepository.findById(TestData.SOURCE_ID_ONE),
                 partyOptional -> partyOptional.isPresent()

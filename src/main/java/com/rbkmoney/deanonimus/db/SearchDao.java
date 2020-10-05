@@ -5,6 +5,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.lucene.search.join.ScoreMode;
 import org.elasticsearch.index.query.QueryBuilder;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
@@ -19,6 +21,9 @@ import static org.elasticsearch.index.query.QueryBuilders.*;
 @RequiredArgsConstructor
 public class SearchDao {
 
+    @Value("${data.response.limit}")
+    Integer responseLimit;
+
     private final ElasticsearchRestTemplate elasticsearchRestTemplate;
 
     public SearchHits<Party> searchParty(String text) {
@@ -29,7 +34,10 @@ public class SearchDao {
                 .should(searchContractFields(text))
                 .should(searchContractorFields(text));
 
-        Query searchQuery = new NativeSearchQueryBuilder().withQuery(builder).build();
+        Query searchQuery = new NativeSearchQueryBuilder()
+                .withQuery(builder)
+                .withPageable(PageRequest.of(0, responseLimit))
+                .build();
 
         return elasticsearchRestTemplate.search(searchQuery, Party.class);
     }
