@@ -17,7 +17,7 @@ public class ContractConverter {
         return Optional.ofNullable(contracts).orElse(Collections.emptyList())
                 .stream()
                 .map(this::convertToEntity)
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (a, b) -> a));
     }
 
     private Map.Entry<String, Contract> convertToEntity(com.rbkmoney.deanonimus.domain.Contract contract) {

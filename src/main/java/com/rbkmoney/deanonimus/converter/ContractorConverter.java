@@ -17,7 +17,7 @@ public class ContractorConverter {
         return Optional.ofNullable(contractors).orElse(Collections.emptyList())
                 .stream()
                 .map(this::convertToEntity)
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (a, b) -> a));
     }
 
     private Map.Entry<String, PartyContractor> convertToEntity(Contractor contractor) {
