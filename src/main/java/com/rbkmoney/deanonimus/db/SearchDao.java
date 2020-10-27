@@ -65,6 +65,7 @@ public class SearchDao {
 
     private QueryBuilder searchPartyFields(String text) {
         return multiMatchQuery(text,
+                "id",
                 "email"
         );
     }
