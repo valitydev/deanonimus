@@ -39,6 +39,17 @@ public class ReadTest extends IntegrationTestBase {
     }
 
     @Test
+    public void searchByPartyId() throws TException {
+        givenParty(PARTY, EMAIL);
+
+        List<SearchHit> searchHits = deanonimusServiceHandler.searchParty(PARTY);
+
+        Assert.assertFalse(searchHits.isEmpty());
+        Assert.assertTrue(searchHits.stream()
+                .anyMatch(partySearchHit -> partySearchHit.getParty().getEmail().contains(EMAIL)));
+    }
+
+    @Test
     public void searchByPartyEmail() throws TException {
         givenParty(PARTY, EMAIL);
 
