@@ -50,6 +50,19 @@ public class ReadTest extends IntegrationTestBase {
     }
 
     @Test
+    public void searchByPartyIdWithoutTokens() throws TException {
+        givenParty(PARTY + "-test-kek", EMAIL + "1");
+        givenParty(PARTY + "-test-lol", EMAIL + "2");
+        givenParty(PARTY + "-test-rofl", EMAIL + "3");
+        givenParty(PARTY + "-test-ricardo", EMAIL + "4");
+        givenParty(PARTY + "-test-milos", EMAIL + "5");
+
+        List<SearchHit> searchHits = deanonimusServiceHandler.searchParty(PARTY + "-test-lol");
+
+        Assert.assertEquals(1, searchHits.size());
+    }
+
+    @Test
     public void searchByPartyEmail() throws TException {
         givenParty(PARTY, EMAIL);
 

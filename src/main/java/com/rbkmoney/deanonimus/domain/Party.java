@@ -23,6 +23,7 @@ import java.util.Optional;
 public class Party {
 
     @Id
+    @Field(type = FieldType.Keyword)
     private String id;
     @Field(type = FieldType.Text, analyzer = "autocomplete", searchAnalyzer = "standard")
     private String email;
