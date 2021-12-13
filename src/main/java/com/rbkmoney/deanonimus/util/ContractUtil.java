@@ -12,10 +12,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ContractUtil {
 
-    public static void fillReportPreferences(Contract contract, ServiceAcceptanceActPreferences serviceAcceptanceActPreferences) {
+    public static void fillReportPreferences(Contract contract,
+                                             ServiceAcceptanceActPreferences serviceAcceptanceActPreferences) {
         contract.setReportActSignerFullName(serviceAcceptanceActPreferences.getSigner().getFullName());
-        final com.rbkmoney.damsel.domain.RepresentativeDocument document = serviceAcceptanceActPreferences.getSigner().getDocument();
-        RepresentativeDocument reportActSignerDocument = TypeUtil.toEnumField(document.getSetField().getFieldName(), RepresentativeDocument.class);
+        final com.rbkmoney.damsel.domain.RepresentativeDocument document =
+                serviceAcceptanceActPreferences.getSigner().getDocument();
+        RepresentativeDocument reportActSignerDocument =
+                TypeUtil.toEnumField(document.getSetField().getFieldName(), RepresentativeDocument.class);
         if (reportActSignerDocument == null) {
             throw new IllegalArgumentException("Illegal representative document: " + document);
         }

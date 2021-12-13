@@ -1,4 +1,4 @@
-package com.rbkmoney.deanonimus.kafka.handler.party_management.shop;
+package com.rbkmoney.deanonimus.kafka.handler.party.management.shop;
 
 import com.rbkmoney.damsel.domain.Blocking;
 import com.rbkmoney.damsel.payment_processing.PartyChange;
@@ -7,7 +7,7 @@ import com.rbkmoney.deanonimus.db.exception.PartyNotFoundException;
 import com.rbkmoney.deanonimus.db.exception.ShopNotFoundException;
 import com.rbkmoney.deanonimus.domain.Party;
 import com.rbkmoney.deanonimus.domain.Shop;
-import com.rbkmoney.deanonimus.kafka.handler.party_management.PartyManagementHandler;
+import com.rbkmoney.deanonimus.kafka.handler.party.management.PartyManagementHandler;
 import com.rbkmoney.geck.filter.Filter;
 import com.rbkmoney.geck.filter.PathConditionFilter;
 import com.rbkmoney.geck.filter.condition.IsNullCondition;

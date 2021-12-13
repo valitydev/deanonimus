@@ -1,15 +1,15 @@
-package com.rbkmoney.deanonimus.kafka.handler.party_management.contract;
+package com.rbkmoney.deanonimus.kafka.handler.party.management.shop;
 
-import com.rbkmoney.damsel.domain.LegalAgreement;
+import com.rbkmoney.damsel.domain.ShopLocation;
 import com.rbkmoney.damsel.payment_processing.ClaimEffect;
-import com.rbkmoney.damsel.payment_processing.ContractEffectUnit;
 import com.rbkmoney.damsel.payment_processing.PartyChange;
+import com.rbkmoney.damsel.payment_processing.ShopEffectUnit;
 import com.rbkmoney.deanonimus.db.PartyRepository;
-import com.rbkmoney.deanonimus.db.exception.ContractNotFoundException;
 import com.rbkmoney.deanonimus.db.exception.PartyNotFoundException;
-import com.rbkmoney.deanonimus.domain.Contract;
+import com.rbkmoney.deanonimus.db.exception.ShopNotFoundException;
 import com.rbkmoney.deanonimus.domain.Party;
-import com.rbkmoney.deanonimus.kafka.handler.party_management.AbstractClaimChangedHandler;
+import com.rbkmoney.deanonimus.domain.Shop;
+import com.rbkmoney.deanonimus.kafka.handler.party.management.AbstractClaimChangedHandler;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +22,7 @@ import java.util.List;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class ContractLegalAgreementBoundHandler extends AbstractClaimChangedHandler {
+public class ShopLocationChangedHandler extends AbstractClaimChangedHandler {
 
     private final PartyRepository partyRepository;
 
@@ -32,28 +32,32 @@ public class ContractLegalAgreementBoundHandler extends AbstractClaimChangedHand
         long sequenceId = event.getEventId();
         List<ClaimEffect> claimEffects = getClaimStatus(change).getAccepted().getEffects();
         for (ClaimEffect claimEffect : claimEffects) {
-            if (claimEffect.isSetContractEffect() && claimEffect.getContractEffect().getEffect().isSetLegalAgreementBound()) {
+            if (claimEffect.isSetShopEffect() && claimEffect.getShopEffect().getEffect().isSetLocationChanged()) {
                 handleEvent(event, changeId, sequenceId, claimEffect);
             }
         }
     }
 
     private void handleEvent(MachineEvent event, Integer changeId, long sequenceId, ClaimEffect claimEffect) {
-        ContractEffectUnit contractEffectUnit = claimEffect.getContractEffect();
-        LegalAgreement legalAgreement = contractEffectUnit.getEffect().getLegalAgreementBound();
-        String contractId = contractEffectUnit.getContractId();
+        ShopEffectUnit shopEffect = claimEffect.getShopEffect();
+        ShopLocation locationChanged = shopEffect.getEffect().getLocationChanged();
+        String shopId = shopEffect.getShopId();
         String partyId = event.getSourceId();
-        log.info("Start contract legal agreement bound handling, sequenceId={}, partyId={}, contractId={}, changeId={}",
-                sequenceId, partyId, contractId, changeId);
-
+        log.info("Start shop locationChanged handling, sequenceId={}, partyId={}, shopId={}, changeId={}",
+                sequenceId, partyId, shopId, changeId);
         Party party = partyRepository.findById(partyId).orElseThrow(() -> new PartyNotFoundException(partyId));
 
-        Contract contract = party.getContractById(contractId).orElseThrow(() -> new ContractNotFoundException(contractId));
-        contract.setLegalAgreementId(legalAgreement.getLegalAgreementId());
+        Shop shop = party.getShopById(shopId).orElseThrow(() -> new ShopNotFoundException(shopId));
+
+        if (locationChanged.isSetUrl()) {
+            shop.setLocationUrl(locationChanged.getUrl());
+        } else {
+            throw new IllegalArgumentException("Illegal shop location " + locationChanged);
+        }
 
         partyRepository.save(party);
 
-        log.info("End contract legal agreement bound handling, sequenceId={}, partyId={}, contractId={}, changeId={}",
-                sequenceId, partyId, contractId, changeId);
+        log.info("End shop locationChanged handling, sequenceId={}, partyId={}, shopId={}, changeId={}",
+                sequenceId, partyId, shopId, changeId);
     }
 }

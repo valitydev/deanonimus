@@ -1,4 +1,4 @@
-package com.rbkmoney.deanonimus.kafka.handler.party_management.contract;
+package com.rbkmoney.deanonimus.kafka.handler.party.management.contract;
 
 import com.rbkmoney.damsel.domain.ReportPreferences;
 import com.rbkmoney.damsel.payment_processing.ClaimEffect;
@@ -9,7 +9,7 @@ import com.rbkmoney.deanonimus.db.exception.ContractNotFoundException;
 import com.rbkmoney.deanonimus.db.exception.PartyNotFoundException;
 import com.rbkmoney.deanonimus.domain.Contract;
 import com.rbkmoney.deanonimus.domain.Party;
-import com.rbkmoney.deanonimus.kafka.handler.party_management.AbstractClaimChangedHandler;
+import com.rbkmoney.deanonimus.kafka.handler.party.management.AbstractClaimChangedHandler;
 import com.rbkmoney.deanonimus.util.ContractUtil;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +33,8 @@ public class ContractReportPreferencesChangedHandler extends AbstractClaimChange
         long sequenceId = event.getEventId();
         List<ClaimEffect> claimEffects = getClaimStatus(change).getAccepted().getEffects();
         for (ClaimEffect claimEffect : claimEffects) {
-            if (claimEffect.isSetContractEffect() && claimEffect.getContractEffect().getEffect().isSetReportPreferencesChanged()) {
+            if (claimEffect.isSetContractEffect()
+                    && claimEffect.getContractEffect().getEffect().isSetReportPreferencesChanged()) {
                 handleEvent(event, changeId, sequenceId, claimEffect);
             }
         }
@@ -44,12 +45,17 @@ public class ContractReportPreferencesChangedHandler extends AbstractClaimChange
         ReportPreferences reportPreferencesChanged = contractEffectUnit.getEffect().getReportPreferencesChanged();
         String contractId = contractEffectUnit.getContractId();
         String partyId = event.getSourceId();
-        log.info("Start contract report preferences changed handling, sequenceId={}, partyId={}, contractId={}, changeId={}",
+        log.info(
+                """
+                           Start contract report preferences changed handling,
+                           "sequenceId={}, partyId={}, contractId={}, changeId={}
+                        """,
                 sequenceId, partyId, contractId, changeId);
 
         Party party = partyRepository.findById(partyId).orElseThrow(() -> new PartyNotFoundException(partyId));
 
-        Contract contract = party.getContractById(contractId).orElseThrow(() -> new ContractNotFoundException(contractId));
+        Contract contract =
+                party.getContractById(contractId).orElseThrow(() -> new ContractNotFoundException(contractId));
 
         if (reportPreferencesChanged != null && reportPreferencesChanged.isSetServiceAcceptanceActPreferences()) {
             ContractUtil.fillReportPreferences(contract, reportPreferencesChanged.getServiceAcceptanceActPreferences());
@@ -59,7 +65,11 @@ public class ContractReportPreferencesChangedHandler extends AbstractClaimChange
 
         partyRepository.save(party);
 
-        log.info("End contract report preferences changed handling, sequenceId={}, partyId={}, contractId={}, changeId={}",
+        log.info(
+                """
+                        End contract report preferences changed handling, 
+                        sequenceId={}, partyId={}, contractId={}, changeId={}
+                        """,
                 sequenceId, partyId, contractId, changeId);
     }
 }

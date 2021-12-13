@@ -1,4 +1,4 @@
-package com.rbkmoney.deanonimus.kafka.handler.party_management.contract;
+package com.rbkmoney.deanonimus.kafka.handler.party.management.contract;
 
 import com.rbkmoney.damsel.payment_processing.ClaimEffect;
 import com.rbkmoney.damsel.payment_processing.ContractEffectUnit;
@@ -8,7 +8,7 @@ import com.rbkmoney.deanonimus.db.exception.PartyNotFoundException;
 import com.rbkmoney.deanonimus.domain.Contract;
 import com.rbkmoney.deanonimus.domain.ContractStatus;
 import com.rbkmoney.deanonimus.domain.Party;
-import com.rbkmoney.deanonimus.kafka.handler.party_management.AbstractClaimChangedHandler;
+import com.rbkmoney.deanonimus.kafka.handler.party.management.AbstractClaimChangedHandler;
 import com.rbkmoney.deanonimus.util.ContractUtil;
 import com.rbkmoney.geck.common.util.TBaseUtil;
 import com.rbkmoney.geck.common.util.TypeUtil;
@@ -35,7 +35,8 @@ public class ContractCreatedHandler extends AbstractClaimChangedHandler {
         long sequenceId = event.getEventId();
         List<ClaimEffect> claimEffects = getClaimStatus(change).getAccepted().getEffects();
         for (ClaimEffect claimEffect : claimEffects) {
-            if (claimEffect.isSetContractEffect() && claimEffect.getContractEffect().getEffect().isSetCreated()) {
+            if (claimEffect.isSetContractEffect()
+                    && claimEffect.getContractEffect().getEffect().isSetCreated()) {
                 handleEvent(event, changeId, sequenceId, claimEffect);
             }
         }
@@ -43,16 +44,13 @@ public class ContractCreatedHandler extends AbstractClaimChangedHandler {
 
     private void handleEvent(MachineEvent event, Integer changeId, long sequenceId, ClaimEffect e) {
         ContractEffectUnit contractEffectUnit = e.getContractEffect();
-        com.rbkmoney.damsel.domain.Contract contractCreated = contractEffectUnit.getEffect().getCreated();
         String contractId = contractEffectUnit.getContractId();
         String partyId = event.getSourceId();
         log.info("Start contract created handling, sequenceId={}, partyId={}, contractId={}, changeId={}",
                 sequenceId, partyId, contractId, changeId);
-        Party party = partyRepository.findById(partyId).orElseThrow(() -> new PartyNotFoundException(partyId));
-
         Contract contract = new Contract();
         contract.setId(contractId);
-
+        com.rbkmoney.damsel.domain.Contract contractCreated = contractEffectUnit.getEffect().getCreated();
         contract.setPartyId(partyId);
         if (contractCreated.isSetPaymentInstitution()) {
             contract.setPaymentInstitutionId(contractCreated.getPaymentInstitution().getId());
@@ -68,17 +66,16 @@ public class ContractCreatedHandler extends AbstractClaimChangedHandler {
         if (contractCreated.isSetLegalAgreement()) {
             ContractUtil.fillContractLegalAgreementFields(contract, contractCreated.getLegalAgreement());
         }
-        if (contractCreated.isSetReportPreferences() && contractCreated.getReportPreferences().isSetServiceAcceptanceActPreferences()) {
-            ContractUtil.fillReportPreferences(contract, contractCreated.getReportPreferences().getServiceAcceptanceActPreferences());
+        if (contractCreated.isSetReportPreferences()
+                && contractCreated.getReportPreferences().isSetServiceAcceptanceActPreferences()) {
+            ContractUtil.fillReportPreferences(contract,
+                    contractCreated.getReportPreferences().getServiceAcceptanceActPreferences());
         }
-
         String contractorId = initContractorId(contractCreated);
         contract.setContractorId(contractorId);
-
+        Party party = partyRepository.findById(partyId).orElseThrow(() -> new PartyNotFoundException(partyId));
         party.addContract(contract);
-
         partyRepository.save(party);
-
         log.info("End contract created handling, sequenceId={}, partyId={}, contractId={}, changeId={}",
                 sequenceId, partyId, contractId, changeId);
     }

@@ -1,4 +1,4 @@
-package com.rbkmoney.deanonimus.kafka.handler.party_management.party;
+package com.rbkmoney.deanonimus.kafka.handler.party.management.party;
 
 import com.rbkmoney.damsel.payment_processing.PartyChange;
 import com.rbkmoney.damsel.payment_processing.PartyCreated;
@@ -6,7 +6,7 @@ import com.rbkmoney.deanonimus.db.PartyRepository;
 import com.rbkmoney.deanonimus.domain.Blocking;
 import com.rbkmoney.deanonimus.domain.Party;
 import com.rbkmoney.deanonimus.domain.Suspension;
-import com.rbkmoney.deanonimus.kafka.handler.party_management.PartyManagementHandler;
+import com.rbkmoney.deanonimus.kafka.handler.party.management.PartyManagementHandler;
 import com.rbkmoney.geck.filter.Filter;
 import com.rbkmoney.geck.filter.PathConditionFilter;
 import com.rbkmoney.geck.filter.condition.IsNullCondition;

@@ -1,4 +1,4 @@
-package com.rbkmoney.deanonimus.kafka.handler.party_management.shop;
+package com.rbkmoney.deanonimus.kafka.handler.party.management.shop;
 
 
 import com.rbkmoney.damsel.payment_processing.ClaimEffect;
@@ -10,7 +10,7 @@ import com.rbkmoney.deanonimus.domain.Blocking;
 import com.rbkmoney.deanonimus.domain.Party;
 import com.rbkmoney.deanonimus.domain.Shop;
 import com.rbkmoney.deanonimus.domain.Suspension;
-import com.rbkmoney.deanonimus.kafka.handler.party_management.AbstractClaimChangedHandler;
+import com.rbkmoney.deanonimus.kafka.handler.party.management.AbstractClaimChangedHandler;
 import com.rbkmoney.deanonimus.util.ShopUtil;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import lombok.RequiredArgsConstructor;

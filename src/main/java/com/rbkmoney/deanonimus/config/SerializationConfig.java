@@ -17,7 +17,8 @@ public class SerializationConfig {
     }
 
     @Bean
-    public MachineEventParser<PartyEventData> partyEventDataMachineEventParser(BinaryDeserializer<PartyEventData> partyEventDataBinaryDeserializer) {
+    public MachineEventParser<PartyEventData> partyEventDataMachineEventParser(
+            BinaryDeserializer<PartyEventData> partyEventDataBinaryDeserializer) {
         return new PartyEventDataMachineEventParser(partyEventDataBinaryDeserializer);
     }
 }

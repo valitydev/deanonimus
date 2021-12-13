@@ -3,7 +3,7 @@ package com.rbkmoney.deanonimus;
 
 import com.rbkmoney.deanonimus.db.PartyRepository;
 import com.rbkmoney.deanonimus.domain.Blocking;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
@@ -12,13 +12,13 @@ import java.util.List;
 import static com.rbkmoney.deanonimus.PartyFlowGenerator.*;
 import static org.awaitility.Awaitility.await;
 
-public class WriteTest extends IntegrationTestBase {
+public class WriteTest extends AbstractIntegrationTest {
 
     @Autowired
     private PartyRepository partyRepository;
 
     @Test
-    public void onPartyCreatedElasticHaveIt() throws IOException {
+    void onPartyCreatedElasticHaveIt() throws IOException {
 
         sendMessages(generatePartyContractorFlow(TestData.SOURCE_ID_ONE));
 
@@ -29,7 +29,7 @@ public class WriteTest extends IntegrationTestBase {
     }
 
     @Test
-    public void onPartyBlockingPartyChanges() {
+    void onPartyBlockingPartyChanges() {
         sendMessages(
                 List.of(
                         buildSinkEvent(buildMessagePartyCreated(0L, TestData.SOURCE_ID_ONE)),

@@ -2,7 +2,7 @@ package com.rbkmoney.deanonimus.kafka.handler;
 
 import com.rbkmoney.damsel.payment_processing.PartyChange;
 import com.rbkmoney.damsel.payment_processing.PartyEventData;
-import com.rbkmoney.deanonimus.kafka.handler.party_management.PartyManagementHandler;
+import com.rbkmoney.deanonimus.kafka.handler.party.management.PartyManagementHandler;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import com.rbkmoney.sink.common.parser.impl.MachineEventParser;
 import lombok.RequiredArgsConstructor;
