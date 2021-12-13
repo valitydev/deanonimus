@@ -2,6 +2,7 @@ package com.rbkmoney.deanonimus.converter;
 
 import com.rbkmoney.damsel.deanonimus.*;
 import com.rbkmoney.deanonimus.domain.Contractor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
@@ -9,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static com.rbkmoney.damsel.deanonimus.Contractor.*;
 
 @Component
 public class ContractorConverter {
@@ -28,44 +31,47 @@ public class ContractorConverter {
     }
 
     private com.rbkmoney.damsel.deanonimus.Contractor convertContractor(Contractor contractor) {
-        switch (contractor.getType()) {
-            case legal_entity:
-                return com.rbkmoney.damsel.deanonimus.Contractor.legal_entity(convertLegalEntity(contractor));
-            case private_entity:
-                return com.rbkmoney.damsel.deanonimus.Contractor.private_entity(new PrivateEntity());
-            case registered_user:
-                return com.rbkmoney.damsel.deanonimus.Contractor.registered_user(new RegisteredUser(contractor.getRegisteredUserEmail()));
-            default:
-                throw new IllegalArgumentException("No such contractorType: " + contractor.getType());
-        }
+        return switch (contractor.getType()) {
+            case legal_entity -> legal_entity(convertLegalEntity(contractor));
+            case private_entity -> private_entity(new PrivateEntity());
+            case registered_user -> registered_user(new RegisteredUser(contractor.getRegisteredUserEmail()));
+            default -> throw new IllegalArgumentException("No such contractorType: " + contractor.getType());
+        };
     }
 
     private LegalEntity convertLegalEntity(Contractor contractor) {
-        switch (contractor.getLegalEntity()) {
-            case international_legal_entity:
-                InternationalLegalEntity internationalLegalEntity = new InternationalLegalEntity()
-                        .setLegalName(contractor.getInternationalLegalEntityLegalName())
-                        .setTradingName(contractor.getInternationalLegalEntityTradingName())
-                        .setRegisteredAddress(contractor.getInternationalLegalEntityRegisteredAddress())
-                        .setActualAddress(contractor.getInternationalLegalEntityActualAddress())
-                        .setRegisteredNumber(contractor.getInternationalLegalEntityRegisteredNumber());
-                return LegalEntity.international_legal_entity(internationalLegalEntity);
-            case russian_legal_entity:
-                RussianLegalEntity russianLegalEntity = new RussianLegalEntity()
-                        .setRegisteredName(contractor.getRussianLegalEntityRegisteredName())
-                        .setRegisteredNumber(contractor.getRussianLegalEntityRegisteredNumber())
-                        .setInn(contractor.getRussianLegalEntityInn())
-                        .setActualAddress(contractor.getRussianLegalEntityActualAddress())
-                        .setPostAddress(contractor.getRussianLegalEntityPostAddress())
-                        .setRussianBankAccount(new RussianBankAccount(
-                                contractor.getRussianLegalEntityRussianBankAccount(),
-                                contractor.getRussianLegalEntityRussianBankName(),
-                                contractor.getRussianLegalEntityRussianBankPostAccount(),
-                                contractor.getRussianLegalEntityRussianBankBik()
-                        ));
-                return LegalEntity.russian_legal_entity(russianLegalEntity);
-            default:
-                throw new IllegalArgumentException("No such legalEntity " + contractor.getLegalEntity());
-        }
+        return switch (contractor.getLegalEntity()) {
+            case international_legal_entity -> buildInternationalLegalEntity(contractor);
+            case russian_legal_entity -> buildRussianLegalEntity(contractor);
+            default -> throw new IllegalArgumentException("No such legalEntity " + contractor.getLegalEntity());
+        };
+    }
+
+    @NotNull
+    private LegalEntity buildInternationalLegalEntity(Contractor contractor) {
+        InternationalLegalEntity internationalLegalEntity = new InternationalLegalEntity()
+                .setLegalName(contractor.getInternationalLegalEntityLegalName())
+                .setTradingName(contractor.getInternationalLegalEntityTradingName())
+                .setRegisteredAddress(contractor.getInternationalLegalEntityRegisteredAddress())
+                .setActualAddress(contractor.getInternationalLegalEntityActualAddress())
+                .setRegisteredNumber(contractor.getInternationalLegalEntityRegisteredNumber());
+        return LegalEntity.international_legal_entity(internationalLegalEntity);
+    }
+
+    @NotNull
+    private LegalEntity buildRussianLegalEntity(Contractor contractor) {
+        RussianLegalEntity russianLegalEntity = new RussianLegalEntity()
+                .setRegisteredName(contractor.getRussianLegalEntityRegisteredName())
+                .setRegisteredNumber(contractor.getRussianLegalEntityRegisteredNumber())
+                .setInn(contractor.getRussianLegalEntityInn())
+                .setActualAddress(contractor.getRussianLegalEntityActualAddress())
+                .setPostAddress(contractor.getRussianLegalEntityPostAddress())
+                .setRussianBankAccount(new RussianBankAccount(
+                        contractor.getRussianLegalEntityRussianBankAccount(),
+                        contractor.getRussianLegalEntityRussianBankName(),
+                        contractor.getRussianLegalEntityRussianBankPostAccount(),
+                        contractor.getRussianLegalEntityRussianBankBik()
+                ));
+        return LegalEntity.russian_legal_entity(russianLegalEntity);
     }
 }

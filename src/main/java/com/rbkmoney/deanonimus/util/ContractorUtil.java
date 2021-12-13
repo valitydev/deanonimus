@@ -1,6 +1,7 @@
 package com.rbkmoney.deanonimus.util;
 
 import com.rbkmoney.damsel.domain.InternationalLegalEntity;
+import com.rbkmoney.damsel.domain.RussianBankAccount;
 import com.rbkmoney.damsel.domain.RussianLegalEntity;
 import com.rbkmoney.deanonimus.domain.Contractor;
 import com.rbkmoney.deanonimus.domain.ContractorType;
@@ -12,7 +13,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ContractorUtil {
 
-    public static Contractor convertContractor(String partyId, com.rbkmoney.damsel.domain.Contractor contractorSource, String contractorId) {
+    public static Contractor convertContractor(String partyId,
+                                               com.rbkmoney.damsel.domain.Contractor contractorSource,
+                                               String contractorId) {
         Contractor contractor = new Contractor();
         contractor.setId(contractorId);
         contractor.setPartyId(partyId);
@@ -28,15 +31,18 @@ public class ContractorUtil {
                 contractor.setRussianLegalEntityInn(russianLegalEntity.getInn());
                 contractor.setRussianLegalEntityActualAddress(russianLegalEntity.getActualAddress());
                 contractor.setRussianLegalEntityPostAddress(russianLegalEntity.getPostAddress());
-                contractor.setRussianLegalEntityRussianBankAccount(russianLegalEntity.getRussianBankAccount().getAccount());
-                contractor.setRussianLegalEntityRussianBankName(russianLegalEntity.getRussianBankAccount().getBankName());
-                contractor.setRussianLegalEntityRussianBankPostAccount(russianLegalEntity.getRussianBankAccount().getBankPostAccount());
-                contractor.setRussianLegalEntityRussianBankBik(russianLegalEntity.getRussianBankAccount().getBankBik());
+                RussianBankAccount russianBankAccount = russianLegalEntity.getRussianBankAccount();
+                contractor.setRussianLegalEntityRussianBankAccount(russianBankAccount.getAccount());
+                contractor.setRussianLegalEntityRussianBankName(russianBankAccount.getBankName());
+                contractor.setRussianLegalEntityRussianBankPostAccount(russianBankAccount.getBankPostAccount());
+                contractor.setRussianLegalEntityRussianBankBik(russianBankAccount.getBankBik());
             } else if (contractorSource.getLegalEntity().isSetInternationalLegalEntity()) {
-                InternationalLegalEntity internationalLegalEntity = contractorSource.getLegalEntity().getInternationalLegalEntity();
+                InternationalLegalEntity internationalLegalEntity =
+                        contractorSource.getLegalEntity().getInternationalLegalEntity();
                 contractor.setInternationalLegalEntityLegalName(internationalLegalEntity.getLegalName());
                 contractor.setInternationalLegalEntityTradingName(internationalLegalEntity.getTradingName());
-                contractor.setInternationalLegalEntityRegisteredAddress(internationalLegalEntity.getRegisteredAddress());
+                contractor.setInternationalLegalEntityRegisteredAddress(
+                        internationalLegalEntity.getRegisteredAddress());
                 contractor.setInternationalLegalEntityActualAddress(internationalLegalEntity.getActualAddress());
                 contractor.setInternationalLegalEntityRegisteredNumber(internationalLegalEntity.getRegisteredNumber());
             }

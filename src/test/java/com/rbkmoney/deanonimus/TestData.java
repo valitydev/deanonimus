@@ -11,11 +11,11 @@ import com.rbkmoney.geck.serializer.kit.mock.MockTBaseProcessor;
 import java.time.Instant;
 import java.util.Map;
 
-public class TestData {
+public abstract class TestData {
 
     private static final Map.Entry<FieldHandler, String[]> timeFields = Map.entry(
             structHandler -> structHandler.value(Instant.now().toString()),
-            new String[]{"created_at", "at", "due"}
+            new String[] {"created_at", "at", "due"}
     );
 
     private static final MockTBaseProcessor mockTBaseProcessor = new MockTBaseProcessor(MockMode.ALL, 15, 1);
@@ -60,7 +60,8 @@ public class TestData {
                                                                        String internationalLegalEntityTradingName) {
         return com.rbkmoney.deanonimus.domain.Contractor.builder()
                 .id(id)
-                .type(getContractorType(registeredUserEmail, russianLegalEntityRegisteredInn, internationalLegalEntityLegalName))
+                .type(getContractorType(registeredUserEmail, russianLegalEntityRegisteredInn,
+                        internationalLegalEntityLegalName))
                 .legalEntity(getLegalEntity(russianLegalEntityRegisteredInn, internationalLegalEntityLegalName))
                 .registeredUserEmail(registeredUserEmail)
                 .russianLegalEntityRegisteredName(russianLegalEntityRegisteredName)
@@ -83,7 +84,8 @@ public class TestData {
         return null;
     }
 
-    private static LegalEntity getLegalEntity(String russianLegalEntityRegisteredInn, String internationalLegalEntityLegalName) {
+    private static LegalEntity getLegalEntity(String russianLegalEntityRegisteredInn,
+                                              String internationalLegalEntityLegalName) {
         if (russianLegalEntityRegisteredInn != null) {
             return LegalEntity.russian_legal_entity;
         }

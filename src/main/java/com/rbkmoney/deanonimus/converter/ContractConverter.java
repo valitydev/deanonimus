@@ -50,16 +50,12 @@ public class ContractConverter {
     }
 
     private ContractStatus convertStatus(com.rbkmoney.deanonimus.domain.ContractStatus status) {
-        switch (status) {
-            case active:
-                return ContractStatus.active(new ContractActive());
-            case expired:
-                return ContractStatus.expired(new ContractExpired());
-            case terminated:
-                return ContractStatus.terminated(new ContractTerminated());
-            default:
-                throw new IllegalArgumentException("No such contractStatus: " + status);
-        }
+        return switch (status) {
+            case active -> ContractStatus.active(new ContractActive());
+            case expired -> ContractStatus.expired(new ContractExpired());
+            case terminated -> ContractStatus.terminated(new ContractTerminated());
+            default -> throw new IllegalArgumentException("No such contractStatus: " + status);
+        };
     }
 
 }

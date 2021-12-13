@@ -1,4 +1,4 @@
-package com.rbkmoney.deanonimus.kafka.handler.party_management;
+package com.rbkmoney.deanonimus.kafka.handler.party.management;
 
 import com.rbkmoney.damsel.payment_processing.ClaimStatus;
 import com.rbkmoney.damsel.payment_processing.PartyChange;

@@ -1,4 +1,4 @@
-package com.rbkmoney.deanonimus.kafka.handler.party_management.contractor;
+package com.rbkmoney.deanonimus.kafka.handler.party.management.contractor;
 
 import com.rbkmoney.damsel.domain.PartyContractor;
 import com.rbkmoney.damsel.payment_processing.ClaimEffect;
@@ -7,7 +7,7 @@ import com.rbkmoney.damsel.payment_processing.PartyChange;
 import com.rbkmoney.deanonimus.db.PartyRepository;
 import com.rbkmoney.deanonimus.db.exception.PartyNotFoundException;
 import com.rbkmoney.deanonimus.domain.Party;
-import com.rbkmoney.deanonimus.kafka.handler.party_management.AbstractClaimChangedHandler;
+import com.rbkmoney.deanonimus.kafka.handler.party.management.AbstractClaimChangedHandler;
 import com.rbkmoney.deanonimus.util.ContractorUtil;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import lombok.RequiredArgsConstructor;
@@ -43,14 +43,17 @@ public class ContractorCreatedHandler extends AbstractClaimChangedHandler {
         com.rbkmoney.damsel.domain.Contractor contractorCreated = partyContractor.getContractor();
         String contractorId = contractorEffect.getId();
         String partyId = event.getSourceId();
-        log.info("Start contractor created handling, eventId={}, partyId={}, contractorId={}", eventId, partyId, contractorId);
+        log.info("Start contractor created handling, eventId={}, partyId={}, contractorId={}", eventId, partyId,
+                contractorId);
         Party party = partyRepository.findById(partyId).orElseThrow(() -> new PartyNotFoundException(partyId));
-        com.rbkmoney.deanonimus.domain.Contractor contractor = ContractorUtil.convertContractor(partyId, contractorCreated, contractorId);
+        com.rbkmoney.deanonimus.domain.Contractor contractor =
+                ContractorUtil.convertContractor(partyId, contractorCreated, contractorId);
 
         party.addContractor(contractor);
 
         partyRepository.save(party);
-        log.info("End contractor created handling, eventId={}, partyId={}, contractorId={}", eventId, partyId, contractorId);
+        log.info("End contractor created handling, eventId={}, partyId={}, contractorId={}", eventId, partyId,
+                contractorId);
     }
 
 

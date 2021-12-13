@@ -27,15 +27,15 @@ public class ShopConverter {
     private Shop convertShop(com.rbkmoney.deanonimus.domain.Shop shopDomain) {
         Shop shop = new Shop()
                 .setId(shopDomain.getId())
-        .setBlocking(EnumUtils.convertBlocking(shopDomain.getBlocking()))
-        .setSuspension(EnumUtils.convertSuspension(shopDomain.getSuspension()))
-        .setCategory(new CategoryRef(shopDomain.getCategoryId()))
-        .setContractId(shopDomain.getContractId())
-        .setDetails(new ShopDetails()
-                .setName(shopDomain.getDetailsName())
-                .setDescription(shopDomain.getDetailsDescription())
-        )
-        .setPayoutToolId(shopDomain.getPayoutToolId());
+                .setBlocking(EnumUtils.convertBlocking(shopDomain.getBlocking()))
+                .setSuspension(EnumUtils.convertSuspension(shopDomain.getSuspension()))
+                .setCategory(new CategoryRef(shopDomain.getCategoryId()))
+                .setContractId(shopDomain.getContractId())
+                .setDetails(new ShopDetails()
+                        .setName(shopDomain.getDetailsName())
+                        .setDescription(shopDomain.getDetailsDescription())
+                )
+                .setPayoutToolId(shopDomain.getPayoutToolId());
 
         setAccount(shopDomain, shop);
 
