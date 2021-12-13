@@ -46,13 +46,11 @@ public class ContractLegalAgreementBoundHandler extends AbstractClaimChangedHand
         String partyId = event.getSourceId();
         log.info("Start contract legal agreement bound handling, sequenceId={}, partyId={}, contractId={}, changeId={}",
                 sequenceId, partyId, contractId, changeId);
-
-        Party party = partyRepository.findById(partyId).orElseThrow(() -> new PartyNotFoundException(partyId));
-
-        Contract contract =
-                party.getContractById(contractId).orElseThrow(() -> new ContractNotFoundException(contractId));
+        Party party = partyRepository.findById(partyId)
+                .orElseThrow(() -> new PartyNotFoundException(partyId));
+        Contract contract = party.getContractById(contractId)
+                .orElseThrow(() -> new ContractNotFoundException(contractId));
         contract.setLegalAgreementId(legalAgreement.getLegalAgreementId());
-
         partyRepository.save(party);
 
         log.info("End contract legal agreement bound handling, sequenceId={}, partyId={}, contractId={}, changeId={}",

@@ -15,8 +15,7 @@ public class ContractUtil {
     public static void fillReportPreferences(Contract contract,
                                              ServiceAcceptanceActPreferences serviceAcceptanceActPreferences) {
         contract.setReportActSignerFullName(serviceAcceptanceActPreferences.getSigner().getFullName());
-        final com.rbkmoney.damsel.domain.RepresentativeDocument document =
-                serviceAcceptanceActPreferences.getSigner().getDocument();
+        var document = serviceAcceptanceActPreferences.getSigner().getDocument();
         RepresentativeDocument reportActSignerDocument =
                 TypeUtil.toEnumField(document.getSetField().getFieldName(), RepresentativeDocument.class);
         if (reportActSignerDocument == null) {

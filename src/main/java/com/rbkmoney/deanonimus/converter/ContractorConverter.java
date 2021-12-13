@@ -2,6 +2,7 @@ package com.rbkmoney.deanonimus.converter;
 
 import com.rbkmoney.damsel.deanonimus.*;
 import com.rbkmoney.deanonimus.domain.Contractor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
@@ -39,32 +40,38 @@ public class ContractorConverter {
     }
 
     private LegalEntity convertLegalEntity(Contractor contractor) {
-        switch (contractor.getLegalEntity()) {
-            case international_legal_entity -> {
-                InternationalLegalEntity internationalLegalEntity = new InternationalLegalEntity()
-                        .setLegalName(contractor.getInternationalLegalEntityLegalName())
-                        .setTradingName(contractor.getInternationalLegalEntityTradingName())
-                        .setRegisteredAddress(contractor.getInternationalLegalEntityRegisteredAddress())
-                        .setActualAddress(contractor.getInternationalLegalEntityActualAddress())
-                        .setRegisteredNumber(contractor.getInternationalLegalEntityRegisteredNumber());
-                return LegalEntity.international_legal_entity(internationalLegalEntity);
-            }
-            case russian_legal_entity -> {
-                RussianLegalEntity russianLegalEntity = new RussianLegalEntity()
-                        .setRegisteredName(contractor.getRussianLegalEntityRegisteredName())
-                        .setRegisteredNumber(contractor.getRussianLegalEntityRegisteredNumber())
-                        .setInn(contractor.getRussianLegalEntityInn())
-                        .setActualAddress(contractor.getRussianLegalEntityActualAddress())
-                        .setPostAddress(contractor.getRussianLegalEntityPostAddress())
-                        .setRussianBankAccount(new RussianBankAccount(
-                                contractor.getRussianLegalEntityRussianBankAccount(),
-                                contractor.getRussianLegalEntityRussianBankName(),
-                                contractor.getRussianLegalEntityRussianBankPostAccount(),
-                                contractor.getRussianLegalEntityRussianBankBik()
-                        ));
-                return LegalEntity.russian_legal_entity(russianLegalEntity);
-            }
+        return switch (contractor.getLegalEntity()) {
+            case international_legal_entity -> buildInternationalLegalEntity(contractor);
+            case russian_legal_entity -> buildRussianLegalEntity(contractor);
             default -> throw new IllegalArgumentException("No such legalEntity " + contractor.getLegalEntity());
-        }
+        };
+    }
+
+    @NotNull
+    private LegalEntity buildInternationalLegalEntity(Contractor contractor) {
+        InternationalLegalEntity internationalLegalEntity = new InternationalLegalEntity()
+                .setLegalName(contractor.getInternationalLegalEntityLegalName())
+                .setTradingName(contractor.getInternationalLegalEntityTradingName())
+                .setRegisteredAddress(contractor.getInternationalLegalEntityRegisteredAddress())
+                .setActualAddress(contractor.getInternationalLegalEntityActualAddress())
+                .setRegisteredNumber(contractor.getInternationalLegalEntityRegisteredNumber());
+        return LegalEntity.international_legal_entity(internationalLegalEntity);
+    }
+
+    @NotNull
+    private LegalEntity buildRussianLegalEntity(Contractor contractor) {
+        RussianLegalEntity russianLegalEntity = new RussianLegalEntity()
+                .setRegisteredName(contractor.getRussianLegalEntityRegisteredName())
+                .setRegisteredNumber(contractor.getRussianLegalEntityRegisteredNumber())
+                .setInn(contractor.getRussianLegalEntityInn())
+                .setActualAddress(contractor.getRussianLegalEntityActualAddress())
+                .setPostAddress(contractor.getRussianLegalEntityPostAddress())
+                .setRussianBankAccount(new RussianBankAccount(
+                        contractor.getRussianLegalEntityRussianBankAccount(),
+                        contractor.getRussianLegalEntityRussianBankName(),
+                        contractor.getRussianLegalEntityRussianBankPostAccount(),
+                        contractor.getRussianLegalEntityRussianBankBik()
+                ));
+        return LegalEntity.russian_legal_entity(russianLegalEntity);
     }
 }
