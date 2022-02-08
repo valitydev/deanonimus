@@ -3,7 +3,7 @@ server:
 
 management:
   security:
-    enabled: false
+    flag: false
   server:
     port: '@management.port@'
   metrics:
@@ -29,8 +29,8 @@ spring:
     ansi:
       enabled: always
   elasticsearch:
-    rest:
-      uris: "http://localhost:9200"
+    uris: "http://localhost:9200"
+
 info:
   version: '@project.version@'
   stage: dev

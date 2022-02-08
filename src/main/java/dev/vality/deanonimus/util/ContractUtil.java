@@ -5,7 +5,7 @@ import dev.vality.damsel.domain.LegalAgreement;
 import dev.vality.damsel.domain.ServiceAcceptanceActPreferences;
 import dev.vality.deanonimus.domain.Contract;
 import dev.vality.deanonimus.domain.RepresentativeDocument;
-import com.rbkmoney.geck.common.util.TypeUtil;
+import dev.vality.geck.common.util.TypeUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 

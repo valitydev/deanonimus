@@ -1,7 +1,7 @@
 package dev.vality.deanonimus.endpoint;
 
 import dev.vality.damsel.deanonimus.DeanonimusSrv;
-import com.rbkmoney.woody.thrift.impl.http.THServiceBuilder;
+import dev.vality.woody.thrift.impl.http.THServiceBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.*;
