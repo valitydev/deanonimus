@@ -4,9 +4,9 @@ import dev.vality.deanonimus.domain.ContractStatus;
 import dev.vality.deanonimus.domain.ContractorType;
 import dev.vality.deanonimus.domain.LegalEntity;
 import dev.vality.deanonimus.domain.Suspension;
-import com.rbkmoney.geck.serializer.kit.mock.FieldHandler;
-import com.rbkmoney.geck.serializer.kit.mock.MockMode;
-import com.rbkmoney.geck.serializer.kit.mock.MockTBaseProcessor;
+import dev.vality.geck.serializer.kit.mock.FieldHandler;
+import dev.vality.geck.serializer.kit.mock.MockMode;
+import dev.vality.geck.serializer.kit.mock.MockTBaseProcessor;
 
 import java.time.Instant;
 import java.util.Map;

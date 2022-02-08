@@ -2,10 +2,10 @@ package dev.vality.deanonimus.kafka.handler.party.management;
 
 import dev.vality.damsel.payment_processing.ClaimStatus;
 import dev.vality.damsel.payment_processing.PartyChange;
-import com.rbkmoney.geck.filter.Filter;
-import com.rbkmoney.geck.filter.PathConditionFilter;
-import com.rbkmoney.geck.filter.condition.IsNullCondition;
-import com.rbkmoney.geck.filter.rule.PathConditionRule;
+import dev.vality.geck.filter.Filter;
+import dev.vality.geck.filter.PathConditionFilter;
+import dev.vality.geck.filter.condition.IsNullCondition;
+import dev.vality.geck.filter.rule.PathConditionRule;
 
 public abstract class AbstractClaimChangedHandler implements PartyManagementHandler {
 

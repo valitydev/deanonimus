@@ -6,7 +6,7 @@ import dev.vality.damsel.domain.RussianLegalEntity;
 import dev.vality.deanonimus.domain.Contractor;
 import dev.vality.deanonimus.domain.ContractorType;
 import dev.vality.deanonimus.domain.LegalEntity;
-import com.rbkmoney.geck.common.util.TBaseUtil;
+import dev.vality.geck.common.util.TBaseUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 

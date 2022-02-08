@@ -1,7 +1,7 @@
 package dev.vality.deanonimus.converter;
 
 import dev.vality.damsel.deanonimus.*;
-import com.rbkmoney.geck.common.util.TypeUtil;
+import dev.vality.geck.common.util.TypeUtil;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;

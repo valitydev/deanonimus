@@ -2,10 +2,10 @@ package dev.vality.deanonimus;
 
 import dev.vality.damsel.domain.*;
 import dev.vality.damsel.payment_processing.*;
-import com.rbkmoney.geck.common.util.TypeUtil;
-import com.rbkmoney.geck.serializer.kit.mock.MockMode;
-import com.rbkmoney.geck.serializer.kit.mock.MockTBaseProcessor;
-import com.rbkmoney.geck.serializer.kit.tbase.TBaseHandler;
+import dev.vality.geck.common.util.TypeUtil;
+import dev.vality.geck.serializer.kit.mock.MockMode;
+import dev.vality.geck.serializer.kit.mock.MockTBaseProcessor;
+import dev.vality.geck.serializer.kit.tbase.TBaseHandler;
 import dev.vality.machinegun.eventsink.MachineEvent;
 import dev.vality.machinegun.eventsink.SinkEvent;
 import dev.vality.machinegun.msgpack.Value;

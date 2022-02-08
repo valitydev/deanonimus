@@ -1,7 +1,7 @@
 package dev.vality.deanonimus.kafka.handler.party.management;
 
 
-import com.rbkmoney.geck.filter.Filter;
+import dev.vality.geck.filter.Filter;
 import org.apache.commons.lang3.NotImplementedException;
 
 public interface Handler<T, E> {
