@@ -1,8 +1,7 @@
 package dev.vality.deanonimus;
 
-
-import dev.vality.deanonimus.extension.ElasticsearchContainerExtension;
 import dev.vality.deanonimus.extension.KafkaContainerExtension;
+import dev.vality.deanonimus.extension.OpensearchContainerExtension;
 import dev.vality.kafka.common.serialization.ThriftSerializer;
 import dev.vality.machinegun.eventsink.SinkEvent;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 @Slf4j
-@ExtendWith({KafkaContainerExtension.class, ElasticsearchContainerExtension.class})
+@ExtendWith({KafkaContainerExtension.class, OpensearchContainerExtension.class})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @SpringBootTest
 public abstract class AbstractIntegrationTest {
@@ -32,8 +31,12 @@ public abstract class AbstractIntegrationTest {
     @DynamicPropertySource
     static void containersProps(DynamicPropertyRegistry registry) {
         registry.add("kafka.bootstrap-servers", KafkaContainerExtension.KAFKA::getBootstrapServers);
-        registry.add("spring.elasticsearch.rest.uris",
-                ElasticsearchContainerExtension.ELASTIC_SEARCH::getHttpHostAddress);
+        registry.add("spring.elasticsearch.rest.uris", () -> {
+            return "http://" +
+                    OpensearchContainerExtension.OPENSEARCH.getHost() +
+                    ":" +
+                    OpensearchContainerExtension.OPENSEARCH.getFirstMappedPort();
+        });
     }
 
     public static void sendMessages(List<SinkEvent> sinkEvents) {
