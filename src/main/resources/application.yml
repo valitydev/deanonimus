@@ -30,6 +30,17 @@ spring:
       enabled: always
   elasticsearch:
     uris: "http://localhost:9200"
+  kafka:
+    bootstrap-servers: localhost:9092
+    client-id: deanonimus
+    consumer:
+      group-id: "DeanonimusListener"
+      enable-auto-commit: false
+      auto-offset-reset: earliest
+      max-poll-records: 20
+      properties:
+        max.poll.interval.ms: 30000
+        session.timeout.ms: 30000
 
 info:
   version: '@project.version@'
@@ -40,24 +51,7 @@ data:
     limit: 25
 
 kafka:
-  bootstrap-servers: localhost:9092
-  client-id: deanonimus
-  ssl:
-    enabled: false
-    trust-store-location: "test"
-    trust-store-password: "test"
-    key-store-location: "test"
-    key-store-password: "test"
-    key-password: "test"
-    key-store-type: PKCS12
-    trust-store-type: PKCS12
   consumer:
-    group-id: "DeanonimusListener"
-    enable-auto-commit: false
-    auto-offset-reset: earliest
-    max-poll-records: 20
-    max-poll-interval-ms: 30000
-    session-timeout-ms: 30000
     party-management:
       concurrency: 7
   topics:

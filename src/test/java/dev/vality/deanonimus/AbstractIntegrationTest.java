@@ -30,7 +30,7 @@ public abstract class AbstractIntegrationTest {
 
     @DynamicPropertySource
     static void containersProps(DynamicPropertyRegistry registry) {
-        registry.add("kafka.bootstrap-servers", KafkaContainerExtension.KAFKA::getBootstrapServers);
+        registry.add("spring.kafka.bootstrap-servers", KafkaContainerExtension.KAFKA::getBootstrapServers);
         registry.add("spring.elasticsearch.rest.uris", () -> {
             return "http://" +
                     OpensearchContainerExtension.OPENSEARCH.getHost() +
