@@ -1,7 +1,7 @@
 package dev.vality.deanonimus.config;
 
 import dev.vality.deanonimus.kafka.serde.SinkEventDeserializer;
-import dev.vality.kafka.common.exception.handler.ExponentialBackOffDefaultErrorHandler;
+import dev.vality.kafka.common.util.ExponentialBackOffDefaultErrorHandlerFactory;
 import dev.vality.machinegun.eventsink.MachineEvent;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -17,7 +17,6 @@ import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.listener.CommonErrorHandler;
 import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
 import org.springframework.kafka.listener.ContainerProperties;
-import org.springframework.util.backoff.ExponentialBackOff;
 
 import java.util.Map;
 
@@ -76,7 +75,7 @@ public class KafkaConfig {
     }
 
     public CommonErrorHandler kafkaErrorHandler() {
-        return new ExponentialBackOffDefaultErrorHandler(new ExponentialBackOff());
+        return ExponentialBackOffDefaultErrorHandlerFactory.create();
     }
 
 }
