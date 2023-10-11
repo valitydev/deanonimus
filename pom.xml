@@ -6,11 +6,11 @@
     <parent>
         <groupId>dev.vality</groupId>
         <artifactId>service-parent-pom</artifactId>
-        <version>1.0.18</version>
+        <version>1.0.20</version>
     </parent>
 
     <artifactId>deanonimus</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.1</version>
     <packaging>jar</packaging>
 
     <name>Deanonimus</name>
@@ -89,10 +89,7 @@
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-elasticsearch</artifactId>
             <!--Compatible with opensearch -->
-            <version>4.2.1</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.elasticsearch.client</groupId>
+            <version>4.2.1</ve4.4.16</groupId>
                     <artifactId>elasticsearch-rest-high-level-client</artifactId>
                 </exclusion>
             </exclusions>
@@ -119,12 +116,12 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.22</version>
+            <version>1.18.22</1.18.30
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <version>3.12.0</version>
+            <version>3.12.0</v3.13.0
         </dependency>
         <dependency>
             <groupId>org.elasticsearch</groupId>
@@ -134,7 +131,7 @@
         <dependency>
             <groupId>org.elasticsearch.client</groupId>
             <artifactId>elasticsearch-rest-high-level-client</artifactId>
-            <version>7.12.1</version>
+            <version>7.12.1</v7.17.14
         </dependency>
         <dependency>
             <groupId>software.amazon.msk</groupId>
@@ -155,19 +152,17 @@
         <dependency>
             <groupId>org.awaitility</groupId>
             <artifactId>awaitility</artifactId>
-            <version>4.0.3</version>
-            <scope>test</scope>
+            <version>4.0.3</ve4.2.0</scope>
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>kafka</artifactId>
-            <version>1.16.2</version>
-            <scope>test</scope>
+            <version>1.16.2</v1.19.1</scope>
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>elasticsearch</artifactId>
-            <version>1.16.2</version>
+            <version>1.16.2</v1.19.1
         </dependency>
     </dependencies>
 
@@ -201,7 +196,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-remote-resources-plugin</artifactId>
-                <version>1.6.0</version>
+                <version>1.7.0</version>
                 <dependencies>
                     <dependency>
                         <groupId>org.apache.maven.shared</groupId>
