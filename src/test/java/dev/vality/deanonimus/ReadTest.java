@@ -1,6 +1,7 @@
 package dev.vality.deanonimus;
 
 import dev.vality.damsel.deanonimus.SearchHit;
+import dev.vality.damsel.deanonimus.SearchShopHit;
 import dev.vality.deanonimus.db.PartyRepository;
 import dev.vality.deanonimus.domain.Party;
 import dev.vality.deanonimus.handler.DeanonimusServiceHandler;
@@ -98,6 +99,30 @@ public class ReadTest extends AbstractIntegrationTest {
         assertTrue(searchHits.stream()
                 .anyMatch(partySearchHit -> partySearchHit.getParty().getShops().values().stream()
                         .anyMatch(shop -> shop.getId().equals(SHOP))));
+    }
+
+    @Test
+    void searchShopByShopId() throws TException {
+        Party party = givenParty(PARTY, EMAIL);
+        givenShop(party, SHOP, URL);
+
+        List<SearchShopHit> searchShopHits = deanonimusServiceHandler.searchShopText(SHOP);
+
+        assertFalse(searchShopHits.isEmpty());
+        assertTrue(searchShopHits.stream()
+                .anyMatch(partySearchHit -> partySearchHit.getShop().getId().equals(SHOP)));
+    }
+
+    @Test
+    void searchShopByShopUrl() throws TException {
+        Party party = givenParty(PARTY, EMAIL);
+        givenShop(party, SHOP, URL);
+
+        List<SearchShopHit> searchHits = deanonimusServiceHandler.searchShopText(URL);
+
+        assertFalse(searchHits.isEmpty());
+        assertTrue(searchHits.stream()
+                .anyMatch(partySearchHit -> partySearchHit.getShop().getLocation().getUrl().contains(URL)));
     }
 
     @Test
