@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class ShopESToShopConverter implements Converter<dev.vality.deanonimus.domain.Shop, Shop> {
+public class ShopDomainToShopApiConverter implements Converter<dev.vality.deanonimus.domain.Shop, Shop> {
 
     @Override
     public Shop convert(dev.vality.deanonimus.domain.Shop shopDomain) {
