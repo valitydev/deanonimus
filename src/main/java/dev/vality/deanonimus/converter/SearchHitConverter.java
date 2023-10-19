@@ -25,4 +25,5 @@ public class SearchHitConverter {
     private SearchHit convertSearchHit(org.springframework.data.elasticsearch.core.SearchHit<Party> partySearchHit) {
         return new SearchHit(partySearchHit.getScore(), partyConverter.convert(partySearchHit.getContent()));
     }
+
 }
