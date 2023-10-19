@@ -2,9 +2,7 @@ package dev.vality.deanonimus.converter;
 
 import dev.vality.damsel.deanonimus.SearchHit;
 import dev.vality.deanonimus.domain.Party;
-import dev.vality.deanonimus.domain.Shop;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.stereotype.Component;
 
