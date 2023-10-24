@@ -10,7 +10,7 @@ import org.testcontainers.utility.DockerImageName;
 public class OpensearchContainerExtension implements BeforeAllCallback, AfterAllCallback {
 
     public static GenericContainer<?> OPENSEARCH = new GenericContainer<>(
-            DockerImageName.parse("opensearchproject/opensearch").withTag("1.2.4")
+            DockerImageName.parse("opensearchproject/opensearch").withTag("2")
     );
 
     @Override
