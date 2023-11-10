@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>deanonimus</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.1</version>
     <packaging>jar</packaging>
 
     <name>Deanonimus</name>
@@ -63,7 +63,7 @@
         <dependency>
             <groupId>dev.vality</groupId>
             <artifactId>deanonimus-proto</artifactId>
-            <version>1.36-94fb655</version>
+            <version>1.38-c54cca0</version>
         </dependency>
         <!--spring-->
         <dependency>
