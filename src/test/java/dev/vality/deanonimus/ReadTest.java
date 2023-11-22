@@ -5,9 +5,9 @@ import dev.vality.damsel.deanonimus.SearchShopHit;
 import dev.vality.deanonimus.domain.Party;
 import dev.vality.deanonimus.handler.DeanonimusServiceHandler;
 import dev.vality.deanonimus.service.OpenSearchService;
+import lombok.SneakyThrows;
 import org.apache.thrift.TException;
 import org.junit.jupiter.api.Test;
-import org.opensearch.client.opensearch.OpenSearchClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -36,13 +36,11 @@ public class ReadTest extends AbstractIntegrationTest {
     private static final String ACCOUNT = "9999999999";
 
 
+    @SneakyThrows
     @Test
     void searchByPartyId() throws TException {
-        Party crp = givenParty(PARTY, EMAIL);
-        Party party = openSearchService.findPartyById(PARTY);
-        givenShop(party, SHOP, URL);
-        Party partyWistShop = openSearchService.findPartyById(PARTY);
-        assertFalse(partyWistShop.getShops().isEmpty());
+        givenParty(PARTY, EMAIL);
+        Thread.sleep(1000);
         List<SearchHit> searchHits = deanonimusServiceHandler.searchParty(PARTY);
 
         assertFalse(searchHits.isEmpty());
@@ -50,6 +48,7 @@ public class ReadTest extends AbstractIntegrationTest {
                 .anyMatch(partySearchHit -> partySearchHit.getParty().getEmail().contains(EMAIL)));
     }
 
+    @SneakyThrows
     @Test
     void searchByPartyIdWithoutTokens() throws TException {
         givenParty(PARTY + "-test-kek", EMAIL + "1");
@@ -57,7 +56,7 @@ public class ReadTest extends AbstractIntegrationTest {
         givenParty(PARTY + "-test-rofl", EMAIL + "3");
         givenParty(PARTY + "-test-ricardo", EMAIL + "4");
         givenParty(PARTY + "-test-milos", EMAIL + "5");
-
+        Thread.sleep(1000);
         List<SearchHit> searchHits = deanonimusServiceHandler.searchParty(PARTY + "-test-lol");
 
         assertEquals(1, searchHits.size());

@@ -3,14 +3,14 @@ package dev.vality.deanonimus.extension;
 import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
-import org.opensearch.testcontainers.OpensearchContainer;
+import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.HttpWaitStrategy;
 import org.testcontainers.utility.DockerImageName;
 
 public class OpensearchContainerExtension implements BeforeAllCallback, AfterAllCallback {
 
 
-    public static OpensearchContainer OPENSEARCH = new OpensearchContainer(
+    public static GenericContainer<?> OPENSEARCH = new GenericContainer<>(
             DockerImageName.parse("opensearchproject/opensearch:2.0.0")
     );
 
