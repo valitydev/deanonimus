@@ -2,7 +2,7 @@ package dev.vality.deanonimus.converter;
 
 import dev.vality.damsel.deanonimus.*;
 import dev.vality.deanonimus.domain.Contractor;
-import org.jetbrains.annotations.NotNull;
+import org.codehaus.commons.nullanalysis.NotNull;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;

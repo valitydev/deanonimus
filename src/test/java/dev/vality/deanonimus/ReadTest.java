@@ -2,12 +2,12 @@ package dev.vality.deanonimus;
 
 import dev.vality.damsel.deanonimus.SearchHit;
 import dev.vality.damsel.deanonimus.SearchShopHit;
-import dev.vality.deanonimus.db.PartyRepository;
 import dev.vality.deanonimus.domain.Party;
 import dev.vality.deanonimus.handler.DeanonimusServiceHandler;
+import dev.vality.deanonimus.service.OpenSearchService;
 import org.apache.thrift.TException;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.opensearch.client.opensearch.OpenSearchClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -21,7 +21,7 @@ public class ReadTest extends AbstractIntegrationTest {
     Integer responseLimit;
 
     @Autowired
-    PartyRepository partyRepository;
+    OpenSearchService openSearchService;
 
     @Autowired
     DeanonimusServiceHandler deanonimusServiceHandler;
@@ -35,15 +35,14 @@ public class ReadTest extends AbstractIntegrationTest {
     private static final String INN = "1234234123";
     private static final String ACCOUNT = "9999999999";
 
-    @BeforeEach
-    void setUp() {
-        partyRepository.deleteAll();
-    }
 
     @Test
     void searchByPartyId() throws TException {
-        givenParty(PARTY, EMAIL);
-
+        Party crp = givenParty(PARTY, EMAIL);
+        Party party = openSearchService.findPartyById(PARTY);
+        givenShop(party, SHOP, URL);
+        Party partyWistShop = openSearchService.findPartyById(PARTY);
+        assertFalse(partyWistShop.getShops().isEmpty());
         List<SearchHit> searchHits = deanonimusServiceHandler.searchParty(PARTY);
 
         assertFalse(searchHits.isEmpty());
@@ -269,7 +268,7 @@ public class ReadTest extends AbstractIntegrationTest {
                 null,
                 null,
                 null));
-        partyRepository.save(party);
+        openSearchService.updateParty(party);
     }
 
     private void givenRussianContractor(Party party,
@@ -284,16 +283,16 @@ public class ReadTest extends AbstractIntegrationTest {
                 russianLegalEntityRussianBankAccount,
                 null,
                 null));
-        partyRepository.save(party);
+        openSearchService.updateParty(party);
     }
 
     private void givenShop(Party party, String id, String url) {
         party.addShop(TestData.shop(id, url));
-        partyRepository.save(party);
+        openSearchService.updateParty(party);
     }
 
     private Party givenParty(String id, String email) {
-        return partyRepository.save(TestData.party(id, email));
+        return openSearchService.createParty(TestData.party(id, email));
     }
 
     private void givenInternationalContractor(Party party,
@@ -307,7 +306,7 @@ public class ReadTest extends AbstractIntegrationTest {
                 null,
                 internationalLegalEntityLegalName,
                 internationalLegalEntityTradingName));
-        partyRepository.save(party);
+        openSearchService.updateParty(party);
     }
 
     private void givenContract(Party party,
@@ -319,7 +318,7 @@ public class ReadTest extends AbstractIntegrationTest {
                 termsId,
                 legalAgreementId,
                 reportActSignerFullName));
-        partyRepository.save(party);
+        openSearchService.updateParty(party);
     }
 
 }

@@ -4,15 +4,15 @@ import dev.vality.damsel.domain.ReportPreferences;
 import dev.vality.damsel.payment_processing.ClaimEffect;
 import dev.vality.damsel.payment_processing.ContractEffectUnit;
 import dev.vality.damsel.payment_processing.PartyChange;
-import dev.vality.deanonimus.db.PartyRepository;
 import dev.vality.deanonimus.db.exception.ContractNotFoundException;
-import dev.vality.deanonimus.db.exception.PartyNotFoundException;
 import dev.vality.deanonimus.domain.Contract;
 import dev.vality.deanonimus.domain.Party;
 import dev.vality.deanonimus.kafka.handler.party.management.AbstractClaimChangedHandler;
+import dev.vality.deanonimus.service.OpenSearchService;
 import dev.vality.deanonimus.util.ContractUtil;
 import dev.vality.machinegun.eventsink.MachineEvent;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
@@ -25,7 +25,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ContractReportPreferencesChangedHandler extends AbstractClaimChangedHandler {
 
-    private final PartyRepository partyRepository;
+    private final OpenSearchService openSearchService;
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
@@ -52,7 +52,7 @@ public class ContractReportPreferencesChangedHandler extends AbstractClaimChange
                         """,
                 sequenceId, partyId, contractId, changeId);
 
-        Party party = partyRepository.findById(partyId).orElseThrow(() -> new PartyNotFoundException(partyId));
+        Party party = openSearchService.findPartyById(partyId);
 
         Contract contract =
                 party.getContractById(contractId).orElseThrow(() -> new ContractNotFoundException(contractId));
@@ -63,7 +63,7 @@ public class ContractReportPreferencesChangedHandler extends AbstractClaimChange
             ContractUtil.setNullReportPreferences(contract);
         }
 
-        partyRepository.save(party);
+        openSearchService.updateParty(party);
 
         log.info(
                 """

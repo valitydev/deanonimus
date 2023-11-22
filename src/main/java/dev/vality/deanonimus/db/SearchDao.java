@@ -1,10 +1,10 @@
 package dev.vality.deanonimus.db;
 
 import dev.vality.deanonimus.domain.Party;
-import org.springframework.data.elasticsearch.core.SearchHits;
+import org.opensearch.client.opensearch.core.SearchResponse;
 
 public interface SearchDao {
 
-    SearchHits<Party> searchParty(String text);
+    SearchResponse<Party> searchParty(String text);
 
 }

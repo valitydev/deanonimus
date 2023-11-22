@@ -1,10 +1,13 @@
 package dev.vality.deanonimus;
 
 
-import dev.vality.deanonimus.db.PartyRepository;
 import dev.vality.deanonimus.domain.Blocking;
+import dev.vality.deanonimus.service.OpenSearchService;
 import org.junit.jupiter.api.Test;
+import org.opensearch.client.RestClient;
+import org.opensearch.client.opensearch.OpenSearchClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.io.IOException;
 import java.util.List;
@@ -15,15 +18,15 @@ import static org.awaitility.Awaitility.await;
 public class WriteTest extends AbstractIntegrationTest {
 
     @Autowired
-    private PartyRepository partyRepository;
+    OpenSearchService openSearchService;
 
     @Test
     void onPartyCreatedElasticHaveIt() throws IOException {
 
         sendMessages(generatePartyContractorFlow(TestData.SOURCE_ID_ONE));
 
-        await().until(() -> partyRepository.findById(TestData.SOURCE_ID_ONE),
-                partyOptional -> partyOptional.isPresent() && partyOptional.get().getId().equals(TestData.SOURCE_ID_ONE)
+        await().until(() -> openSearchService.findPartyById(TestData.SOURCE_ID_ONE),
+                party -> party != null && party.getId().equals(TestData.SOURCE_ID_ONE)
         );
 
     }
@@ -37,10 +40,10 @@ public class WriteTest extends AbstractIntegrationTest {
                 )
         );
 
-        await().until(() -> partyRepository.findById(TestData.SOURCE_ID_ONE),
-                partyOptional -> partyOptional.isPresent()
-                        && partyOptional.get().getId().equals(TestData.SOURCE_ID_ONE)
-                        && partyOptional.get().getBlocking().equals(Blocking.blocked)
+        await().until(() -> openSearchService.findPartyById(TestData.SOURCE_ID_ONE),
+                partyOptional -> partyOptional != null
+                        && partyOptional.getId().equals(TestData.SOURCE_ID_ONE)
+                        && partyOptional.getBlocking().equals(Blocking.blocked)
         );
 
     }

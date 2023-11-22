@@ -1,11 +1,11 @@
 server:
-  port: '@server.port@'
+  port: '${server.port}'
 
 management:
   security:
     flag: false
   server:
-    port: '@management.port@'
+    port: '${management.port}'
   metrics:
     export:
       prometheus:
@@ -41,6 +41,10 @@ spring:
       properties:
         max.poll.interval.ms: 30000
         session.timeout.ms: 30000
+
+opensearch:
+  hostname: "localhost"
+  port: 9200
 
 info:
   version: '@project.version@'
