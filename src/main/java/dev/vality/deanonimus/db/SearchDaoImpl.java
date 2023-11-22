@@ -5,12 +5,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.opensearch.client.opensearch.OpenSearchClient;
-import org.opensearch.client.opensearch._types.FieldValue;
 import org.opensearch.client.opensearch._types.query_dsl.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import static dev.vality.deanonimus.constant.ElasticsearchConstants.*;
+import static dev.vality.deanonimus.constant.OpenSearchConstants.*;
 
 @Slf4j
 @Component

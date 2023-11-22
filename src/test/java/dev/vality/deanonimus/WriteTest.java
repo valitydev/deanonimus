@@ -4,10 +4,7 @@ package dev.vality.deanonimus;
 import dev.vality.deanonimus.domain.Blocking;
 import dev.vality.deanonimus.service.OpenSearchService;
 import org.junit.jupiter.api.Test;
-import org.opensearch.client.RestClient;
-import org.opensearch.client.opensearch.OpenSearchClient;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.io.IOException;
 import java.util.List;

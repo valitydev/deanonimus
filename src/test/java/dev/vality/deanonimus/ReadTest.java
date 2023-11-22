@@ -319,7 +319,7 @@ public class ReadTest extends AbstractIntegrationTest {
     }
 
     @SneakyThrows
-    private void sleep(){
+    private void sleep() {
         Thread.sleep(1000);
     }
 
