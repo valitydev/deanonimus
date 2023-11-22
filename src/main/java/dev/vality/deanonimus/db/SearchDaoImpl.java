@@ -87,7 +87,7 @@ public class SearchDaoImpl implements SearchDao {
                 .query(new Query(new MultiMatchQuery.Builder()
                         .fields("shops.id",
                                 "shops.locationUrl",
-                                "shops.name")
+                                "shops.detailsName")
                         .query(text)
                         .type(TextQueryType.Phrase)
                         .build()))
