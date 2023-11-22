@@ -16,15 +16,16 @@ import static java.util.stream.Collectors.toList;
 @RequiredArgsConstructor
 public class SearchHitShopConverter {
 
-    private final ShopListConverter converter;
+    private final ShopListConverter shopListConverter;
+    private final PartyConverter partyConverter;
 
 
     public List<SearchShopHit> convert(SearchResponse<Party> searchHits) {
         List<SearchShopHit> hits = new ArrayList<>();
         for (Hit<Party> searchHit : searchHits.hits().hits()) {
-            hits.addAll(converter.convert(searchHit.source().getShops()).values()
+            hits.addAll(shopListConverter.convert(searchHit.source().getShops()).values()
                     .stream()
-                    .map(shop -> new SearchShopHit(searchHit.score(), shop, null))
+                    .map(shop -> new SearchShopHit(searchHit.score(), shop, partyConverter.convert(searchHit.source())))
                     .collect(toList()));
         }
         return hits;

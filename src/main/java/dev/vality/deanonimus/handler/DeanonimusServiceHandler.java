@@ -29,8 +29,7 @@ public class DeanonimusServiceHandler implements DeanonimusSrv.Iface {
         log.info("Incoming request for party with text: {}", text);
         SearchResponse<Party> searchHits = searchDao.searchParty(text);
         log.info("Found party: {}", searchHits);
-        List<SearchHit> list = searchHitConverter.convert(searchHits);
-        return list;
+        return searchHitConverter.convert(searchHits);
     }
 
     @Override

@@ -6,6 +6,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.opensearch._types.query_dsl.*;
+import org.opensearch.client.opensearch.core.SearchResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -24,7 +25,7 @@ public class SearchDaoImpl implements SearchDao {
 
     @SneakyThrows
     @Override
-    public org.opensearch.client.opensearch.core.SearchResponse<Party> searchParty(String text) {
+    public SearchResponse<Party> searchParty(String text) {
 
         BoolQuery queryBuilder = new BoolQuery.Builder()
                 .should(searchPartyFields(text),
@@ -85,7 +86,8 @@ public class SearchDaoImpl implements SearchDao {
                 .path(SHOP_INDEX)
                 .query(new Query(new MultiMatchQuery.Builder()
                         .fields("shops.id",
-                                "shops.locationUrl")
+                                "shops.locationUrl",
+                                "shops.name")
                         .query(text)
                         .type(TextQueryType.Phrase)
                         .build()))
