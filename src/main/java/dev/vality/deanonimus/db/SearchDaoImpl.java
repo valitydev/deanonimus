@@ -34,6 +34,7 @@ public class SearchDaoImpl implements SearchDao {
                 .build();
 
         return openSearchClient.search(s -> s
+                        .size(responseLimit)
                         .query(new Query.Builder()
                                 .bool(queryBuilder)
                                 .build()),

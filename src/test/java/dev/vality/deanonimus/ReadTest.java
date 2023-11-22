@@ -156,7 +156,7 @@ public class ReadTest extends AbstractIntegrationTest {
         givenRussianContractor(party, CONTRACTOR, "ООО \"ЧИ ИЛИ НЕ ЧИ\"", INN, ACCOUNT);
 
         sleep();
-        List<SearchHit> searchHits = deanonimusServiceHandler.searchParty("ЧИ ДА");
+        List<SearchHit> searchHits = deanonimusServiceHandler.searchParty("ЧИ ИЛИ");
 
         assertFalse(searchHits.isEmpty());
         assertTrue(searchHits.stream()
