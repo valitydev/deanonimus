@@ -63,7 +63,7 @@ public class ReadTest extends AbstractIntegrationTest {
     @Test
     void searchByPartyEmail() throws TException {
         givenParty(PARTY, EMAIL);
-
+        sleep();
         List<SearchHit> searchHits = deanonimusServiceHandler.searchParty(EMAIL);
 
         assertFalse(searchHits.isEmpty());
@@ -75,7 +75,7 @@ public class ReadTest extends AbstractIntegrationTest {
     void searchByShopUrl() throws TException {
         Party party = givenParty(PARTY, EMAIL);
         givenShop(party, SHOP, URL);
-
+        sleep();
         List<SearchHit> searchHits = deanonimusServiceHandler.searchParty(URL);
 
         assertFalse(searchHits.isEmpty());
@@ -88,7 +88,7 @@ public class ReadTest extends AbstractIntegrationTest {
     void searchByShopId() throws TException {
         Party party = givenParty(PARTY, EMAIL);
         givenShop(party, SHOP, URL);
-
+        sleep();
         List<SearchHit> searchHits = deanonimusServiceHandler.searchParty(SHOP);
 
         assertFalse(searchHits.isEmpty());
@@ -101,7 +101,7 @@ public class ReadTest extends AbstractIntegrationTest {
     void searchShopByShopId() throws TException {
         Party party = givenParty(PARTY, EMAIL);
         givenShop(party, SHOP, URL);
-
+        sleep();
         List<SearchShopHit> searchShopHits = deanonimusServiceHandler.searchShopText(SHOP);
 
         assertFalse(searchShopHits.isEmpty());
@@ -113,7 +113,7 @@ public class ReadTest extends AbstractIntegrationTest {
     void searchShopByShopUrl() throws TException {
         Party party = givenParty(PARTY, EMAIL);
         givenShop(party, SHOP, URL);
-
+        sleep();
         List<SearchShopHit> searchHits = deanonimusServiceHandler.searchShopText(URL);
 
         assertFalse(searchHits.isEmpty());
@@ -126,7 +126,7 @@ public class ReadTest extends AbstractIntegrationTest {
         Party party = givenParty(PARTY, null);
         givenRegisteredUserContractor(party, CONTRACTOR, EMAIL);
 
-
+        sleep();
         List<SearchHit> searchHits = deanonimusServiceHandler.searchParty(EMAIL);
 
         assertFalse(searchHits.isEmpty());
@@ -140,7 +140,7 @@ public class ReadTest extends AbstractIntegrationTest {
         Party party = givenParty(PARTY, null);
         givenRussianContractor(party, CONTRACTOR, "ООО \"ЧИ ИЛИ НЕ ЧИ\"", INN, ACCOUNT);
 
-
+        sleep();
         List<SearchHit> searchHits = deanonimusServiceHandler.searchParty("ЧИ");
 
         assertFalse(searchHits.isEmpty());
@@ -155,7 +155,7 @@ public class ReadTest extends AbstractIntegrationTest {
         Party party = givenParty(PARTY, null);
         givenRussianContractor(party, CONTRACTOR, "ООО \"ЧИ ИЛИ НЕ ЧИ\"", INN, ACCOUNT);
 
-
+        sleep();
         List<SearchHit> searchHits = deanonimusServiceHandler.searchParty("ЧИ ДА");
 
         assertFalse(searchHits.isEmpty());
@@ -169,7 +169,7 @@ public class ReadTest extends AbstractIntegrationTest {
         Party party = givenParty(PARTY, null);
         givenRussianContractor(party, CONTRACTOR, "ООО \"ЧИ ИЛИ НЕ ЧИ\"", INN, ACCOUNT);
 
-
+        sleep();
         List<SearchHit> searchHits = deanonimusServiceHandler.searchParty("ДА");
 
         assertTrue(searchHits.isEmpty());
@@ -180,7 +180,7 @@ public class ReadTest extends AbstractIntegrationTest {
         Party party = givenParty(PARTY, null);
         givenRussianContractor(party, CONTRACTOR, "ООО \"ЧИ ИЛИ НЕ ЧИ\"", INN, ACCOUNT);
 
-
+        sleep();
         List<SearchHit> searchHits = deanonimusServiceHandler.searchParty(INN);
 
         assertFalse(searchHits.isEmpty());
@@ -195,7 +195,7 @@ public class ReadTest extends AbstractIntegrationTest {
         Party party = givenParty(PARTY, null);
         givenRussianContractor(party, CONTRACTOR, "ООО \"ЧИ ИЛИ НЕ ЧИ\"", INN, ACCOUNT);
 
-
+        sleep();
         List<SearchHit> searchHits = deanonimusServiceHandler.searchParty(INN.substring(0, 6));
 
         assertTrue(searchHits.isEmpty());
@@ -206,7 +206,7 @@ public class ReadTest extends AbstractIntegrationTest {
         Party party = givenParty(PARTY, null);
         givenInternationalContractor(party, CONTRACTOR, "SoMe LeGaL NaMe", "ANOTHER TRADING NAME");
 
-
+        sleep();
         List<SearchHit> searchHits = deanonimusServiceHandler.searchParty("legal");
 
         assertFalse(searchHits.isEmpty());
@@ -220,7 +220,7 @@ public class ReadTest extends AbstractIntegrationTest {
         Party party = givenParty(PARTY, null);
         givenContract(party, CONTRACT, 123, "ДГ-123432", "Василий Пупкин");
 
-
+        sleep();
         List<SearchHit> searchHits = deanonimusServiceHandler.searchParty("ДГ");
 
         assertFalse(searchHits.isEmpty());
@@ -235,7 +235,7 @@ public class ReadTest extends AbstractIntegrationTest {
             Party party = givenParty(i + "", i + EMAIL.substring(EMAIL.indexOf("@")));
             givenShop(party, 9 - i + "", URL + i);
         }
-
+        sleep();
         List<SearchHit> searchHits = deanonimusServiceHandler.searchParty("1");
 
         assertEquals(2, searchHits.size());
@@ -249,7 +249,7 @@ public class ReadTest extends AbstractIntegrationTest {
             Party party = givenParty(i + "", EMAIL);
             givenShop(party, 29 - i + "", URL + i);
         }
-
+        sleep();
         List<SearchHit> searchHits = deanonimusServiceHandler.searchParty("email");
 
         assertEquals((long) responseLimit, searchHits.size());
