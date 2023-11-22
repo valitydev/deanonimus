@@ -11,7 +11,6 @@ import dev.vality.deanonimus.kafka.handler.party.management.AbstractClaimChanged
 import dev.vality.deanonimus.service.OpenSearchService;
 import dev.vality.machinegun.eventsink.MachineEvent;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;

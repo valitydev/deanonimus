@@ -15,7 +15,7 @@ public abstract class TestData {
 
     private static final Map.Entry<FieldHandler, String[]> timeFields = Map.entry(
             structHandler -> structHandler.value(Instant.now().toString()),
-            new String[] {"created_at", "at", "due"}
+            new String[]{"created_at", "at", "due"}
     );
 
     private static final MockTBaseProcessor mockTBaseProcessor = new MockTBaseProcessor(MockMode.ALL, 15, 1);
@@ -39,9 +39,9 @@ public abstract class TestData {
     }
 
     public static dev.vality.deanonimus.domain.Contract contract(String id,
-                                                                   Integer termsId,
-                                                                   String legalAgreementId,
-                                                                   String reportActSignerFullName) {
+                                                                 Integer termsId,
+                                                                 String legalAgreementId,
+                                                                 String reportActSignerFullName) {
         return dev.vality.deanonimus.domain.Contract.builder()
                 .id(id)
                 .status(ContractStatus.active)
@@ -52,12 +52,12 @@ public abstract class TestData {
     }
 
     public static dev.vality.deanonimus.domain.Contractor contractor(String id,
-                                                                       String registeredUserEmail,
-                                                                       String russianLegalEntityRegisteredName,
-                                                                       String russianLegalEntityRegisteredInn,
-                                                                       String russianLegalEntityRussianBankAccount,
-                                                                       String internationalLegalEntityLegalName,
-                                                                       String internationalLegalEntityTradingName) {
+                                                                     String registeredUserEmail,
+                                                                     String russianLegalEntityRegisteredName,
+                                                                     String russianLegalEntityRegisteredInn,
+                                                                     String russianLegalEntityRussianBankAccount,
+                                                                     String internationalLegalEntityLegalName,
+                                                                     String internationalLegalEntityTradingName) {
         return dev.vality.deanonimus.domain.Contractor.builder()
                 .id(id)
                 .type(getContractorType(registeredUserEmail, russianLegalEntityRegisteredInn,

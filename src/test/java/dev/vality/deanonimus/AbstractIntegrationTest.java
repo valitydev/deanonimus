@@ -32,7 +32,7 @@ public abstract class AbstractIntegrationTest {
     static void containersProps(DynamicPropertyRegistry registry) {
         registry.add("spring.kafka.bootstrap-servers", KafkaContainerExtension.KAFKA::getBootstrapServers);
         registry.add("opensearch.hostname", () -> OpensearchContainerExtension.OPENSEARCH.getHost());
-        registry.add("opensearch.port",() -> OpensearchContainerExtension.OPENSEARCH.getFirstMappedPort());
+        registry.add("opensearch.port", () -> OpensearchContainerExtension.OPENSEARCH.getFirstMappedPort());
     }
 
     public static void sendMessages(List<SinkEvent> sinkEvents) {

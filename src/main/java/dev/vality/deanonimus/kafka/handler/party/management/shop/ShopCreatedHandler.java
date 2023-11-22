@@ -4,7 +4,6 @@ package dev.vality.deanonimus.kafka.handler.party.management.shop;
 import dev.vality.damsel.payment_processing.ClaimEffect;
 import dev.vality.damsel.payment_processing.PartyChange;
 import dev.vality.damsel.payment_processing.ShopEffectUnit;
-import dev.vality.deanonimus.db.exception.PartyNotFoundException;
 import dev.vality.deanonimus.domain.Blocking;
 import dev.vality.deanonimus.domain.Party;
 import dev.vality.deanonimus.domain.Shop;
