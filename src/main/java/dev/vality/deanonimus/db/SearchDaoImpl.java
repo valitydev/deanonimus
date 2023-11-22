@@ -5,10 +5,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.opensearch.client.opensearch.OpenSearchClient;
-import org.opensearch.client.opensearch._types.query_dsl.BoolQuery;
-import org.opensearch.client.opensearch._types.query_dsl.MultiMatchQuery;
-import org.opensearch.client.opensearch._types.query_dsl.NestedQuery;
-import org.opensearch.client.opensearch._types.query_dsl.Query;
+import org.opensearch.client.opensearch._types.FieldValue;
+import org.opensearch.client.opensearch._types.query_dsl.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -55,6 +53,7 @@ public class SearchDaoImpl implements SearchDao {
                                 "contractors.internationalLegalEntityLegalName",
                                 "contractors.internationalLegalEntityTradingName")
                         .query(text)
+                        .type(TextQueryType.Phrase)
                         .build()))
                 .build().query();
     }
@@ -67,6 +66,7 @@ public class SearchDaoImpl implements SearchDao {
                                 "contracts.legalAgreementId",
                                 "contracts.reportActSignerFullName")
                         .query(text)
+                        .type(TextQueryType.Phrase)
                         .build()))
                 .build().query();
     }
@@ -76,6 +76,7 @@ public class SearchDaoImpl implements SearchDao {
                 .fields("id",
                         "email")
                 .query(text)
+                .type(TextQueryType.Phrase)
                 .build());
     }
 
@@ -86,6 +87,7 @@ public class SearchDaoImpl implements SearchDao {
                         .fields("shops.id",
                                 "shops.locationUrl")
                         .query(text)
+                        .type(TextQueryType.Phrase)
                         .build()))
                 .build().query();
     }
