@@ -3,7 +3,6 @@ package dev.vality.deanonimus;
 
 import dev.vality.deanonimus.domain.Blocking;
 import dev.vality.deanonimus.service.OpenSearchService;
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -11,6 +10,7 @@ import java.io.IOException;
 import java.util.List;
 
 import static dev.vality.deanonimus.PartyFlowGenerator.*;
+import static dev.vality.deanonimus.TestData.sleep;
 import static org.awaitility.Awaitility.await;
 
 public class WriteTest extends AbstractIntegrationTest {
@@ -44,11 +44,6 @@ public class WriteTest extends AbstractIntegrationTest {
                         && partyOptional.getBlocking().equals(Blocking.blocked)
         );
 
-    }
-
-    @SneakyThrows
-    private void sleep() {
-        Thread.sleep(5000);
     }
 
 }

@@ -5,7 +5,6 @@ import dev.vality.damsel.deanonimus.SearchShopHit;
 import dev.vality.deanonimus.domain.Party;
 import dev.vality.deanonimus.handler.DeanonimusServiceHandler;
 import dev.vality.deanonimus.service.OpenSearchService;
-import lombok.SneakyThrows;
 import org.apache.thrift.TException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 
 import java.util.List;
 
+import static dev.vality.deanonimus.TestData.sleep;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ReadTest extends AbstractIntegrationTest {
@@ -316,11 +316,6 @@ public class ReadTest extends AbstractIntegrationTest {
                 legalAgreementId,
                 reportActSignerFullName));
         openSearchService.updateParty(party);
-    }
-
-    @SneakyThrows
-    private void sleep() {
-        Thread.sleep(1000);
     }
 
 }

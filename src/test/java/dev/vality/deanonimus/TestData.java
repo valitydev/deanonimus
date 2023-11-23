@@ -7,6 +7,7 @@ import dev.vality.deanonimus.domain.Suspension;
 import dev.vality.geck.serializer.kit.mock.FieldHandler;
 import dev.vality.geck.serializer.kit.mock.MockMode;
 import dev.vality.geck.serializer.kit.mock.MockTBaseProcessor;
+import lombok.SneakyThrows;
 
 import java.time.Instant;
 import java.util.Map;
@@ -102,5 +103,10 @@ public abstract class TestData {
                 .blocking(dev.vality.deanonimus.domain.Blocking.unblocked)
                 .suspension(Suspension.active)
                 .build();
+    }
+
+    @SneakyThrows
+    public static void sleep() {
+        Thread.sleep(5000);
     }
 }
