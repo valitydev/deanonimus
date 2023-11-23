@@ -104,9 +104,4 @@ public abstract class TestData {
                 .suspension(Suspension.active)
                 .build();
     }
-
-    @SneakyThrows
-    public static void sleep() {
-        Thread.sleep(5000);
-    }
 }
