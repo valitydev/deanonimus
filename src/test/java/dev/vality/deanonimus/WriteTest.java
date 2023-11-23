@@ -3,6 +3,7 @@ package dev.vality.deanonimus;
 
 import dev.vality.deanonimus.domain.Blocking;
 import dev.vality.deanonimus.service.OpenSearchService;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -21,7 +22,7 @@ public class WriteTest extends AbstractIntegrationTest {
     void onPartyCreatedElasticHaveIt() throws IOException {
 
         sendMessages(generatePartyContractorFlow(TestData.SOURCE_ID_ONE));
-
+        sleep();
         await().until(() -> openSearchService.findPartyById(TestData.SOURCE_ID_ONE),
                 party -> party != null && party.getId().equals(TestData.SOURCE_ID_ONE)
         );
@@ -36,13 +37,18 @@ public class WriteTest extends AbstractIntegrationTest {
                         buildSinkEvent(buildMessagePartyBlocking(0L, TestData.SOURCE_ID_ONE))
                 )
         );
-
+        sleep();
         await().until(() -> openSearchService.findPartyById(TestData.SOURCE_ID_ONE),
                 partyOptional -> partyOptional != null
                         && partyOptional.getId().equals(TestData.SOURCE_ID_ONE)
                         && partyOptional.getBlocking().equals(Blocking.blocked)
         );
 
+    }
+
+    @SneakyThrows
+    private void sleep() {
+        Thread.sleep(5000);
     }
 
 }
