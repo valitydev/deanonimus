@@ -28,8 +28,6 @@ spring:
   output:
     ansi:
       enabled: always
-  elasticsearch:
-    uris: "http://localhost:9200"
   kafka:
     bootstrap-servers: localhost:9092
     client-id: deanonimus

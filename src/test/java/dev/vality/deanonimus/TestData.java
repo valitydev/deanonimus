@@ -7,7 +7,6 @@ import dev.vality.deanonimus.domain.Suspension;
 import dev.vality.geck.serializer.kit.mock.FieldHandler;
 import dev.vality.geck.serializer.kit.mock.MockMode;
 import dev.vality.geck.serializer.kit.mock.MockTBaseProcessor;
-import lombok.SneakyThrows;
 
 import java.time.Instant;
 import java.util.Map;
@@ -36,6 +35,13 @@ public abstract class TestData {
                 .categoryId(1)
                 .contractId("1")
                 .detailsName("name")
+                .build();
+    }
+
+    public static dev.vality.deanonimus.domain.Wallet wallet(String id, String name) {
+        return dev.vality.deanonimus.domain.Wallet.builder()
+                .id(id)
+                .name(name)
                 .build();
     }
 

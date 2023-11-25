@@ -31,6 +31,7 @@ public class PartyFlowGenerator {
     public static final Integer REVISION_ID = 431531;
     public static final Integer CATEGORY_ID = 542432;
     public static final String CONTRACT_ID = "142534";
+    public static final String WALLET_ID = "345435435";
     public static final String PAYOUT_ID = "654635";
     public static final String DETAILS_NAME = "testDetailsName";
     public static final String DETAILS_DESCRIPTION = "testDescription";
@@ -96,6 +97,14 @@ public class PartyFlowGenerator {
                 sequenceId++, partyId,
                 buildSuspendedShopSuspension(TypeUtil.temporalToString(LocalDateTime.now()), shopId))));
 
+        return sinkEvents;
+    }
+
+    public static List<SinkEvent> generateWalletFlow(String partyId) throws IOException {
+        List<SinkEvent> sinkEvents = new ArrayList<>();
+        Long sequenceId = 0L;
+        sinkEvents.add(buildSinkEvent(buildMessagePartyCreated(sequenceId++, partyId)));
+        sinkEvents.add(buildSinkEvent(buildMessageWalletCreated(sequenceId++, partyId, WALLET_ID)));
         return sinkEvents;
     }
 
@@ -314,6 +323,12 @@ public class PartyFlowGenerator {
         return buildMachineEvent(partyId, sequenceId, partyChange);
     }
 
+    public static MachineEvent buildMessageWalletCreated(Long sequenceId, String partyId, String walletId)
+            throws IOException {
+        PartyChange partyChange = buildWalletCreatedPartyChange(walletId);
+        return buildMachineEvent(partyId, sequenceId, partyChange);
+    }
+
     public static PartyChange buildShopCreatedPartyChange(String shopId) throws IOException {
         Shop shop = buildShopCreated();
         ShopEffectUnit shopEffectUnit = new ShopEffectUnit();
@@ -327,6 +342,20 @@ public class PartyFlowGenerator {
         PartyChange partyChange = new PartyChange();
         partyChange.setClaimCreated(claim);
 
+        return partyChange;
+    }
+
+    public static PartyChange buildWalletCreatedPartyChange(String walletd) throws IOException {
+        WalletEffectUnit walletEffectUnit = new WalletEffectUnit();
+        walletEffectUnit.setId(walletd);
+        WalletEffect shopEffect = new WalletEffect();
+        shopEffect.setCreated(buildWalletCreated());
+        walletEffectUnit.setEffect(shopEffect);
+        ClaimEffect claimEffect = new ClaimEffect();
+        claimEffect.setWalletEffect(walletEffectUnit);
+        Claim claim = buildClaimCreated(claimEffect);
+        PartyChange partyChange = new PartyChange();
+        partyChange.setClaimCreated(claim);
         return partyChange;
     }
 
@@ -620,6 +649,14 @@ public class PartyFlowGenerator {
         shop.setBlocking(blocking);
         shop.setSuspension(buildPartySuspension());
         return shop;
+    }
+
+    public static Wallet buildWalletCreated() throws IOException {
+        Wallet wallet = new Wallet();
+        wallet = new MockTBaseProcessor(MockMode.ALL).process(wallet, new TBaseHandler<>(Wallet.class));
+        wallet.setCreatedAt(TypeUtil.temporalToString(LocalDateTime.now()));
+        wallet.setSuspension(buildPartySuspension());
+        return wallet;
     }
 
     public static ShopSuspension buildActiveShopSuspension(String since, String shopId) {

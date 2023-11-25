@@ -31,7 +31,8 @@ public class SearchDaoImpl implements SearchDao {
                 .should(searchPartyFields(text),
                         searchShopFields(text),
                         searchContractFields(text),
-                        searchContractorFields(text))
+                        searchContractorFields(text),
+                        searchWalletFields(text))
                 .build();
 
         return openSearchClient.search(s -> s
@@ -88,6 +89,18 @@ public class SearchDaoImpl implements SearchDao {
                         .fields("shops.id",
                                 "shops.locationUrl",
                                 "shops.detailsName")
+                        .query(text)
+                        .type(TextQueryType.Phrase)
+                        .build()))
+                .build().query();
+    }
+
+    private Query searchWalletFields(String text) {
+        return new NestedQuery.Builder()
+                .path(WALLET_INDEX)
+                .query(new Query(new MultiMatchQuery.Builder()
+                        .fields("wallets.id",
+                                "wallets.name")
                         .query(text)
                         .type(TextQueryType.Phrase)
                         .build()))

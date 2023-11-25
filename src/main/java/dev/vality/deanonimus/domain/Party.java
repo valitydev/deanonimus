@@ -24,6 +24,7 @@ public class Party {
     private List<Contractor> contractors;
     private List<Contract> contracts;
     private List<Shop> shops;
+    private List<Wallet> wallets;
 
     public void addShop(Shop shop) {
         if (this.shops == null) {
@@ -44,6 +45,13 @@ public class Party {
             this.contractors = new ArrayList<>();
         }
         this.contractors.add(contractor);
+    }
+
+    public void addWallet(Wallet wallet) {
+        if (this.wallets == null) {
+            this.wallets = new ArrayList<>();
+        }
+        this.wallets.add(wallet);
     }
 
     public Optional<Shop> getShopById(String id) {

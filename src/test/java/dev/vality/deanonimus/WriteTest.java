@@ -30,6 +30,18 @@ public class WriteTest extends AbstractIntegrationTest {
     }
 
     @Test
+    void onPartyCreatedWalletFlowElasticHaveIt() throws IOException {
+
+        sendMessages(generateWalletFlow(TestData.SOURCE_ID_ONE));
+        sleep();
+        await().until(() -> openSearchService.findPartyById(TestData.SOURCE_ID_ONE),
+                party -> party != null && party.getId().equals(TestData.SOURCE_ID_ONE)
+                        && !party.getWallets().isEmpty()
+        );
+
+    }
+
+    @Test
     void onPartyBlockingPartyChanges() {
         sendMessages(
                 List.of(

@@ -2,6 +2,7 @@ package dev.vality.deanonimus;
 
 import dev.vality.damsel.deanonimus.SearchHit;
 import dev.vality.damsel.deanonimus.SearchShopHit;
+import dev.vality.damsel.deanonimus.SearchWalletHit;
 import dev.vality.deanonimus.domain.Party;
 import dev.vality.deanonimus.handler.DeanonimusServiceHandler;
 import dev.vality.deanonimus.service.OpenSearchService;
@@ -36,6 +37,8 @@ public class ReadTest extends AbstractIntegrationTest {
     private static final String URL = "http://url.com";
     private static final String CONTRACT = "contract";
     private static final String CONTRACTOR = "contractor";
+    private static final String WALLET = "wallet";
+    private static final String WALLET_NAME = "wallet_name";
     private static final String INN = "1234234123";
     private static final String ACCOUNT = "9999999999";
 
@@ -123,6 +126,30 @@ public class ReadTest extends AbstractIntegrationTest {
         assertFalse(searchHits.isEmpty());
         assertTrue(searchHits.stream()
                 .anyMatch(partySearchHit -> partySearchHit.getShop().getLocation().getUrl().contains(URL)));
+    }
+
+    @Test
+    void searchWalletByName() throws TException {
+        Party party = givenParty(PARTY, EMAIL);
+        givenWallet(party, WALLET, WALLET_NAME);
+        refreshIndices();
+        List<SearchWalletHit> searchHits = deanonimusServiceHandler.searchWalletText(WALLET_NAME);
+
+        assertFalse(searchHits.isEmpty());
+        assertTrue(searchHits.stream()
+                .anyMatch(partySearchHit -> partySearchHit.getWallet().getName().contains(WALLET_NAME)));
+    }
+
+    @Test
+    void searchWalletById() throws TException {
+        Party party = givenParty(PARTY, EMAIL);
+        givenWallet(party, WALLET, WALLET_NAME);
+        refreshIndices();
+        List<SearchWalletHit> searchHits = deanonimusServiceHandler.searchWalletText(WALLET);
+
+        assertFalse(searchHits.isEmpty());
+        assertTrue(searchHits.stream()
+                .anyMatch(partySearchHit -> partySearchHit.getWallet().getId().contains(WALLET)));
     }
 
     @Test
@@ -289,6 +316,11 @@ public class ReadTest extends AbstractIntegrationTest {
 
     private void givenShop(Party party, String id, String url) {
         party.addShop(TestData.shop(id, url));
+        openSearchService.updateParty(party);
+    }
+
+    private void givenWallet(Party party, String id, String name) {
+        party.addWallet(TestData.wallet(id, name));
         openSearchService.updateParty(party);
     }
 
