@@ -66,8 +66,8 @@ public class ContractReportPreferencesChangedHandler extends AbstractClaimChange
 
         log.info(
                 """
-                        End contract report preferences changed handling, 
-                        sequenceId={}, partyId={}, contractId={}, changeId={}
+                        End contract report preferences changed handling,
+                         sequenceId={}, partyId={}, contractId={}, changeId={}
                         """,
                 sequenceId, partyId, contractId, changeId);
     }

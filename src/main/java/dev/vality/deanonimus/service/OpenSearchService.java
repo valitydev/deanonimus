@@ -26,7 +26,6 @@ public class OpenSearchService {
                         .id(partyId)
                         .build(),
                 Party.class).source();
-
     }
 
     @SneakyThrows
@@ -37,8 +36,7 @@ public class OpenSearchService {
                         .id(party.getId())
                         .doc(party)
                         .build(),
-                Party.class
-        );
+                Party.class);
     }
 
     @SneakyThrows

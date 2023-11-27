@@ -10,8 +10,6 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 
-import static java.util.stream.Collectors.toList;
-
 @Component
 @RequiredArgsConstructor
 public class SearchHitWalletConverter {
@@ -29,8 +27,9 @@ public class SearchHitWalletConverter {
                             searchHit.score(),
                             wallet,
                             partyConverter.convert(searchHit.source())))
-                    .collect(toList()));
+                    .toList());
         }
+
         return hits;
     }
 }

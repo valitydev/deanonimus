@@ -11,7 +11,6 @@ import dev.vality.deanonimus.db.SearchDao;
 import dev.vality.deanonimus.domain.Party;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.thrift.TException;
 import org.opensearch.client.opensearch.core.SearchResponse;
 import org.springframework.stereotype.Component;
 
@@ -28,7 +27,7 @@ public class DeanonimusServiceHandler implements DeanonimusSrv.Iface {
     private final SearchDao searchDao;
 
     @Override
-    public List<SearchHit> searchParty(String text) throws TException {
+    public List<SearchHit> searchParty(String text) {
         log.info("Incoming request for party with text: {}", text);
         SearchResponse<Party> searchHits = searchDao.searchParty(text);
         log.info("Found party: {}", searchHits);
@@ -36,7 +35,7 @@ public class DeanonimusServiceHandler implements DeanonimusSrv.Iface {
     }
 
     @Override
-    public List<SearchShopHit> searchShopText(String text) throws TException {
+    public List<SearchShopHit> searchShopText(String text) {
         log.info("Incoming request for shop with text: {}", text);
         SearchResponse<Party> searchHits = searchDao.searchParty(text);
         log.info("Found shop: {}", searchHits);
@@ -44,7 +43,7 @@ public class DeanonimusServiceHandler implements DeanonimusSrv.Iface {
     }
 
     @Override
-    public List<SearchWalletHit> searchWalletText(String text) throws TException {
+    public List<SearchWalletHit> searchWalletText(String text) {
         log.info("Incoming request for wallets with text: {}", text);
         SearchResponse<Party> searchHits = searchDao.searchParty(text);
         log.info("Found wallet: {}", searchHits);

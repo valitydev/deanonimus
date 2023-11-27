@@ -44,9 +44,7 @@ public class WalletCreatedHandler extends AbstractClaimChangedHandler {
                 sequenceId, partyId, walletId, changeId);
 
         Party party = openSearchService.findPartyById(partyId);
-
         Wallet wallet = fillWalletInfo(walletCreated, walletId);
-
         party.addWallet(wallet);
 
         openSearchService.updateParty(party);
@@ -59,8 +57,7 @@ public class WalletCreatedHandler extends AbstractClaimChangedHandler {
         Wallet wallet = new Wallet();
         wallet.setId(walletId);
         wallet.setName(walletCreated.getName());
+
         return wallet;
     }
-
-
 }

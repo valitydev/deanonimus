@@ -61,9 +61,4 @@ public class Party {
     public Optional<Contract> getContractById(String id) {
         return this.contracts.stream().filter(contract -> contract.getId().equals(id)).findFirst();
     }
-
-    public Optional<Contractor> getContractorById(String id) {
-        return this.contractors.stream().filter(contractor -> contractor.getId().equals(id)).findFirst();
-    }
-
 }

@@ -27,6 +27,4 @@ public class WalletListConverter {
                 walletDomain.getName()
         ));
     }
-
-
 }
