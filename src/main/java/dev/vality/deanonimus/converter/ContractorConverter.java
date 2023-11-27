@@ -2,9 +2,9 @@ package dev.vality.deanonimus.converter;
 
 import dev.vality.damsel.deanonimus.*;
 import dev.vality.deanonimus.domain.Contractor;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
+import javax.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
