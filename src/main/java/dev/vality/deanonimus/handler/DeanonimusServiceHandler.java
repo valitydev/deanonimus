@@ -30,23 +30,26 @@ public class DeanonimusServiceHandler implements DeanonimusSrv.Iface {
     public List<SearchHit> searchParty(String text) {
         log.info("Incoming request for party with text: {}", text);
         SearchResponse<Party> searchHits = searchDao.searchParty(text);
-        log.info("Found party: {}", searchHits);
-        return searchHitConverter.convert(searchHits);
+        var foundSearchHits = searchHitConverter.convert(searchHits);
+        log.info("Found party: {}", foundSearchHits);
+        return foundSearchHits;
     }
 
     @Override
     public List<SearchShopHit> searchShopText(String text) {
         log.info("Incoming request for shop with text: {}", text);
         SearchResponse<Party> searchHits = searchDao.searchParty(text);
-        log.info("Found shop: {}", searchHits);
-        return searchHitShopConverter.convert(searchHits);
+        var foundSearchHits = searchHitShopConverter.convert(searchHits);
+        log.info("Found shop: {}", foundSearchHits);
+        return foundSearchHits;
     }
 
     @Override
     public List<SearchWalletHit> searchWalletText(String text) {
         log.info("Incoming request for wallets with text: {}", text);
         SearchResponse<Party> searchHits = searchDao.searchParty(text);
-        log.info("Found wallet: {}", searchHits);
-        return searchHitWalletConverter.convert(searchHits);
+        var foundSearchHits = searchHitWalletConverter.convert(searchHits);
+        log.info("Found wallet: {}", foundSearchHits);
+        return foundSearchHits;
     }
 }
