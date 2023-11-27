@@ -37,7 +37,6 @@ public class DeanonimusServiceHandler implements DeanonimusSrv.Iface {
         SearchResponse<Party> searchHits = searchDao.searchParty(text);
         var parties = searchHits.hits().hits().stream().map(Hit::source).collect(toList());
         log.info("Found for party search parties: {}", parties);
-        System.out.println(searchHits.hits().hits().stream().map(Hit::source).collect(toList()));
         var foundSearchHits = searchHitConverter.convert(searchHits);
         log.info("Found party: {}", foundSearchHits);
         return foundSearchHits;
