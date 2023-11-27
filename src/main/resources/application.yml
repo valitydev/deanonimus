@@ -1,11 +1,11 @@
 server:
-  port: '@server.port@'
+  port: '${server.port}'
 
 management:
   security:
     flag: false
   server:
-    port: '@management.port@'
+    port: '${management.port}'
   metrics:
     export:
       prometheus:
@@ -28,8 +28,6 @@ spring:
   output:
     ansi:
       enabled: always
-  elasticsearch:
-    uris: "http://localhost:9200"
   kafka:
     bootstrap-servers: localhost:9092
     client-id: deanonimus
@@ -41,6 +39,14 @@ spring:
       properties:
         max.poll.interval.ms: 30000
         session.timeout.ms: 30000
+
+opensearch:
+  username: none
+  password: none
+  hostname: localhost
+  port: 9200
+  certificate: none
+  sslEnabled: false
 
 info:
   version: '@project.version@'

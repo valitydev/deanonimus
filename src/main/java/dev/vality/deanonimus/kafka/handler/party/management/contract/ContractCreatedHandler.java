@@ -3,12 +3,11 @@ package dev.vality.deanonimus.kafka.handler.party.management.contract;
 import dev.vality.damsel.payment_processing.ClaimEffect;
 import dev.vality.damsel.payment_processing.ContractEffectUnit;
 import dev.vality.damsel.payment_processing.PartyChange;
-import dev.vality.deanonimus.db.PartyRepository;
-import dev.vality.deanonimus.db.exception.PartyNotFoundException;
 import dev.vality.deanonimus.domain.Contract;
 import dev.vality.deanonimus.domain.ContractStatus;
 import dev.vality.deanonimus.domain.Party;
 import dev.vality.deanonimus.kafka.handler.party.management.AbstractClaimChangedHandler;
+import dev.vality.deanonimus.service.OpenSearchService;
 import dev.vality.deanonimus.util.ContractUtil;
 import dev.vality.geck.common.util.TBaseUtil;
 import dev.vality.geck.common.util.TypeUtil;
@@ -27,7 +26,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ContractCreatedHandler extends AbstractClaimChangedHandler {
 
-    private final PartyRepository partyRepository;
+    private final OpenSearchService openSearchService;
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
@@ -73,9 +72,9 @@ public class ContractCreatedHandler extends AbstractClaimChangedHandler {
         }
         String contractorId = initContractorId(contractCreated);
         contract.setContractorId(contractorId);
-        Party party = partyRepository.findById(partyId).orElseThrow(() -> new PartyNotFoundException(partyId));
+        Party party = openSearchService.findPartyById(partyId);
         party.addContract(contract);
-        partyRepository.save(party);
+        openSearchService.updateParty(party);
         log.info("End contract created handling, sequenceId={}, partyId={}, contractId={}, changeId={}",
                 sequenceId, partyId, contractId, changeId);
     }

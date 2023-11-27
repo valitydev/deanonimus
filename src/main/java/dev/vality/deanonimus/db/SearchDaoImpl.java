@@ -2,19 +2,15 @@ package dev.vality.deanonimus.db;
 
 import dev.vality.deanonimus.domain.Party;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.lucene.search.join.ScoreMode;
-import org.elasticsearch.index.query.QueryBuilder;
+import org.opensearch.client.opensearch.OpenSearchClient;
+import org.opensearch.client.opensearch._types.query_dsl.*;
+import org.opensearch.client.opensearch.core.SearchResponse;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
-import org.springframework.data.elasticsearch.core.SearchHits;
-import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
-import org.springframework.data.elasticsearch.core.query.Query;
 import org.springframework.stereotype.Component;
 
-import static dev.vality.deanonimus.constant.ElasticsearchConstants.*;
-import static org.elasticsearch.index.query.QueryBuilders.*;
+import static dev.vality.deanonimus.constant.OpenSearchConstants.*;
 
 @Slf4j
 @Component
@@ -24,59 +20,91 @@ public class SearchDaoImpl implements SearchDao {
     @Value("${data.response.limit}")
     Integer responseLimit;
 
-    private final ElasticsearchRestTemplate elasticsearchRestTemplate;
+    private final OpenSearchClient openSearchClient;
 
+
+    @SneakyThrows
     @Override
-    public SearchHits<Party> searchParty(String text) {
+    public SearchResponse<Party> searchParty(String text) {
 
-        QueryBuilder builder = boolQuery()
-                .should(searchPartyFields(text))
-                .should(searchShopFields(text))
-                .should(searchContractFields(text))
-                .should(searchContractorFields(text));
-
-        Query searchQuery = new NativeSearchQueryBuilder()
-                .withQuery(builder)
-                .withPageable(PageRequest.of(0, responseLimit))
+        BoolQuery queryBuilder = new BoolQuery.Builder()
+                .should(searchPartyFields(text),
+                        searchShopFields(text),
+                        searchContractFields(text),
+                        searchContractorFields(text),
+                        searchWalletFields(text))
                 .build();
 
-        return elasticsearchRestTemplate.search(searchQuery, Party.class);
+        return openSearchClient.search(s -> s
+                        .size(responseLimit)
+                        .query(new Query.Builder()
+                                .bool(queryBuilder)
+                                .build()),
+                Party.class);
     }
 
-    private QueryBuilder searchContractorFields(String text) {
-        return nestedQuery(CONTRACTOR_INDEX,
-                multiMatchQuery(text,
-                        "contractors.id",
-                        "contractors.registeredUserEmail",
-                        "contractors.russianLegalEntityRegisteredName",
-                        "contractors.russianLegalEntityInn",
-                        "contractors.russianLegalEntityRussianBankAccount",
-                        "contractors.internationalLegalEntityLegalName",
-                        "contractors.internationalLegalEntityTradingName"), ScoreMode.Total);
+    private Query searchContractorFields(String text) {
+        return new NestedQuery.Builder()
+                .path(CONTRACTOR_INDEX)
+                .query(new Query(new MultiMatchQuery.Builder()
+                        .fields("contractors.id",
+                                "contractors.registeredUserEmail",
+                                "contractors.russianLegalEntityRegisteredName",
+                                "contractors.russianLegalEntityInn",
+                                "contractors.russianLegalEntityRussianBankAccount",
+                                "contractors.internationalLegalEntityLegalName",
+                                "contractors.internationalLegalEntityTradingName")
+                        .query(text)
+                        .type(TextQueryType.Phrase)
+                        .build()))
+                .build().query();
     }
 
-    private QueryBuilder searchContractFields(String text) {
-        return nestedQuery(CONTRACT_INDEX,
-                multiMatchQuery(text,
-                        "contracts.id",
-                        "contracts.legalAgreementId",
-                        "contracts.reportActSignerFullName"), ScoreMode.Total);
+    private Query searchContractFields(String text) {
+        return new NestedQuery.Builder()
+                .path(CONTRACT_INDEX)
+                .query(new Query(new MultiMatchQuery.Builder()
+                        .fields("contracts.id",
+                                "contracts.legalAgreementId",
+                                "contracts.reportActSignerFullName")
+                        .query(text)
+                        .type(TextQueryType.Phrase)
+                        .build()))
+                .build().query();
     }
 
-
-    private QueryBuilder searchPartyFields(String text) {
-        return multiMatchQuery(text,
-                "id",
-                "email"
-        );
+    private Query searchPartyFields(String text) {
+        return new Query(new MultiMatchQuery.Builder()
+                .fields("id",
+                        "email")
+                .query(text)
+                .type(TextQueryType.Phrase)
+                .build());
     }
 
-    private QueryBuilder searchShopFields(String text) {
-        return nestedQuery(SHOP_INDEX,
-                multiMatchQuery(text,
-                        "shops.id",
-                        "shops.locationUrl"
-                ), ScoreMode.Total);
+    private Query searchShopFields(String text) {
+        return new NestedQuery.Builder()
+                .path(SHOP_INDEX)
+                .query(new Query(new MultiMatchQuery.Builder()
+                        .fields("shops.id",
+                                "shops.locationUrl",
+                                "shops.detailsName")
+                        .query(text)
+                        .type(TextQueryType.Phrase)
+                        .build()))
+                .build().query();
+    }
+
+    private Query searchWalletFields(String text) {
+        return new NestedQuery.Builder()
+                .path(WALLET_INDEX)
+                .query(new Query(new MultiMatchQuery.Builder()
+                        .fields("wallets.id",
+                                "wallets.name")
+                        .query(text)
+                        .type(TextQueryType.Phrase)
+                        .build()))
+                .build().query();
     }
 
 }

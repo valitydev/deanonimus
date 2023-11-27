@@ -2,10 +2,9 @@ package dev.vality.deanonimus.kafka.handler.party.management.party;
 
 import dev.vality.damsel.domain.Suspension;
 import dev.vality.damsel.payment_processing.PartyChange;
-import dev.vality.deanonimus.db.PartyRepository;
-import dev.vality.deanonimus.db.exception.PartyNotFoundException;
 import dev.vality.deanonimus.domain.Party;
 import dev.vality.deanonimus.kafka.handler.party.management.PartyManagementHandler;
+import dev.vality.deanonimus.service.OpenSearchService;
 import dev.vality.geck.filter.Filter;
 import dev.vality.geck.filter.PathConditionFilter;
 import dev.vality.geck.filter.condition.IsNullCondition;
@@ -26,7 +25,7 @@ public class PartySuspensionHandler implements PartyManagementHandler {
             "party_suspension",
             new IsNullCondition().not()));
 
-    private final PartyRepository partyRepository;
+    private final OpenSearchService openSearchService;
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
@@ -35,15 +34,15 @@ public class PartySuspensionHandler implements PartyManagementHandler {
         Suspension partySuspension = change.getPartySuspension();
         String partyId = event.getSourceId();
         log.info("Start party suspension handling, eventId={}, partyId={}, changeId={}", sequenceId, partyId, changeId);
-        Party party = partyRepository.findById(partyId).orElseThrow(() -> new PartyNotFoundException(partyId));
+        Party party = openSearchService.findPartyById(partyId);
 
         if (partySuspension.isSetActive()) {
             party.setSuspension(dev.vality.deanonimus.domain.Suspension.active);
         } else if (partySuspension.isSetSuspended()) {
             party.setSuspension(dev.vality.deanonimus.domain.Suspension.suspended);
         }
+        openSearchService.updateParty(party);
 
-        partyRepository.save(party);
         log.info("End party suspension handling, eventId={}, partyId={}, changeId={}", sequenceId, partyId, changeId);
     }
 

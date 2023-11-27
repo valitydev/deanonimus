@@ -2,11 +2,11 @@ package dev.vality.deanonimus.kafka.handler.party.management.party;
 
 import dev.vality.damsel.payment_processing.PartyChange;
 import dev.vality.damsel.payment_processing.PartyCreated;
-import dev.vality.deanonimus.db.PartyRepository;
 import dev.vality.deanonimus.domain.Blocking;
 import dev.vality.deanonimus.domain.Party;
 import dev.vality.deanonimus.domain.Suspension;
 import dev.vality.deanonimus.kafka.handler.party.management.PartyManagementHandler;
+import dev.vality.deanonimus.service.OpenSearchService;
 import dev.vality.geck.filter.Filter;
 import dev.vality.geck.filter.PathConditionFilter;
 import dev.vality.geck.filter.condition.IsNullCondition;
@@ -23,7 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class PartyCreatedHandler implements PartyManagementHandler {
 
-    private final PartyRepository partyRepository;
+    private final OpenSearchService openSearchService;
     private final Filter filter = new PathConditionFilter(new PathConditionRule(
             "party_created",
             new IsNullCondition().not()));
@@ -41,7 +41,7 @@ public class PartyCreatedHandler implements PartyManagementHandler {
         party.setBlocking(Blocking.unblocked);
         party.setSuspension(Suspension.active);
 
-        partyRepository.save(party);
+        openSearchService.createParty(party);
         log.info("Party has been saved, sequenceId={}, partyId={}, changeId={}", sequenceId, partyId, changeId);
     }
 

@@ -1,8 +1,9 @@
 package dev.vality.deanonimus;
 
 
-import dev.vality.deanonimus.db.PartyRepository;
 import dev.vality.deanonimus.domain.Blocking;
+import dev.vality.deanonimus.service.OpenSearchService;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -15,15 +16,27 @@ import static org.awaitility.Awaitility.await;
 public class WriteTest extends AbstractIntegrationTest {
 
     @Autowired
-    private PartyRepository partyRepository;
+    OpenSearchService openSearchService;
 
     @Test
     void onPartyCreatedElasticHaveIt() throws IOException {
 
         sendMessages(generatePartyContractorFlow(TestData.SOURCE_ID_ONE));
+        sleep();
+        await().until(() -> openSearchService.findPartyById(TestData.SOURCE_ID_ONE),
+                party -> party != null && party.getId().equals(TestData.SOURCE_ID_ONE)
+        );
 
-        await().until(() -> partyRepository.findById(TestData.SOURCE_ID_ONE),
-                partyOptional -> partyOptional.isPresent() && partyOptional.get().getId().equals(TestData.SOURCE_ID_ONE)
+    }
+
+    @Test
+    void onPartyCreatedWalletFlowElasticHaveIt() throws IOException {
+
+        sendMessages(generateWalletFlow(TestData.SOURCE_ID_ONE));
+        sleep();
+        await().until(() -> openSearchService.findPartyById(TestData.SOURCE_ID_ONE),
+                party -> party != null && party.getId().equals(TestData.SOURCE_ID_ONE)
+                        && !party.getWallets().isEmpty()
         );
 
     }
@@ -36,13 +49,17 @@ public class WriteTest extends AbstractIntegrationTest {
                         buildSinkEvent(buildMessagePartyBlocking(0L, TestData.SOURCE_ID_ONE))
                 )
         );
-
-        await().until(() -> partyRepository.findById(TestData.SOURCE_ID_ONE),
-                partyOptional -> partyOptional.isPresent()
-                        && partyOptional.get().getId().equals(TestData.SOURCE_ID_ONE)
-                        && partyOptional.get().getBlocking().equals(Blocking.blocked)
+        sleep();
+        await().until(() -> openSearchService.findPartyById(TestData.SOURCE_ID_ONE),
+                partyOptional -> partyOptional != null
+                        && partyOptional.getId().equals(TestData.SOURCE_ID_ONE)
+                        && partyOptional.getBlocking().equals(Blocking.blocked)
         );
 
     }
 
+    @SneakyThrows
+    private void sleep() {
+        Thread.sleep(5000L);
+    }
 }

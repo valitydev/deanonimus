@@ -4,12 +4,11 @@ import dev.vality.damsel.domain.LegalAgreement;
 import dev.vality.damsel.payment_processing.ClaimEffect;
 import dev.vality.damsel.payment_processing.ContractEffectUnit;
 import dev.vality.damsel.payment_processing.PartyChange;
-import dev.vality.deanonimus.db.PartyRepository;
 import dev.vality.deanonimus.db.exception.ContractNotFoundException;
-import dev.vality.deanonimus.db.exception.PartyNotFoundException;
 import dev.vality.deanonimus.domain.Contract;
 import dev.vality.deanonimus.domain.Party;
 import dev.vality.deanonimus.kafka.handler.party.management.AbstractClaimChangedHandler;
+import dev.vality.deanonimus.service.OpenSearchService;
 import dev.vality.machinegun.eventsink.MachineEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +23,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ContractLegalAgreementBoundHandler extends AbstractClaimChangedHandler {
 
-    private final PartyRepository partyRepository;
+    private final OpenSearchService openSearchService;
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
@@ -46,12 +45,11 @@ public class ContractLegalAgreementBoundHandler extends AbstractClaimChangedHand
         String partyId = event.getSourceId();
         log.info("Start contract legal agreement bound handling, sequenceId={}, partyId={}, contractId={}, changeId={}",
                 sequenceId, partyId, contractId, changeId);
-        Party party = partyRepository.findById(partyId)
-                .orElseThrow(() -> new PartyNotFoundException(partyId));
+        Party party = openSearchService.findPartyById(partyId);
         Contract contract = party.getContractById(contractId)
                 .orElseThrow(() -> new ContractNotFoundException(contractId));
         contract.setLegalAgreementId(legalAgreement.getLegalAgreementId());
-        partyRepository.save(party);
+        openSearchService.updateParty(party);
 
         log.info("End contract legal agreement bound handling, sequenceId={}, partyId={}, contractId={}, changeId={}",
                 sequenceId, partyId, contractId, changeId);

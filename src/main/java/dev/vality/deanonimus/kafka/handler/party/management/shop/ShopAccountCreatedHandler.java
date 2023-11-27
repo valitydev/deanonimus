@@ -4,11 +4,10 @@ import dev.vality.damsel.domain.ShopAccount;
 import dev.vality.damsel.payment_processing.ClaimEffect;
 import dev.vality.damsel.payment_processing.PartyChange;
 import dev.vality.damsel.payment_processing.ShopEffectUnit;
-import dev.vality.deanonimus.db.PartyRepository;
-import dev.vality.deanonimus.db.exception.PartyNotFoundException;
 import dev.vality.deanonimus.db.exception.ShopNotFoundException;
 import dev.vality.deanonimus.domain.Party;
 import dev.vality.deanonimus.kafka.handler.party.management.AbstractClaimChangedHandler;
+import dev.vality.deanonimus.service.OpenSearchService;
 import dev.vality.deanonimus.util.ShopUtil;
 import dev.vality.machinegun.eventsink.MachineEvent;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +23,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ShopAccountCreatedHandler extends AbstractClaimChangedHandler {
 
-    private final PartyRepository partyRepository;
+    private final OpenSearchService openSearchService;
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
@@ -46,12 +45,12 @@ public class ShopAccountCreatedHandler extends AbstractClaimChangedHandler {
         log.info("Start shop accountCreated handling, sequenceId={}, partyId={}, shopId={}, changeId={}",
                 sequenceId, partyId, shopId, changeId);
 
-        Party party = partyRepository.findById(partyId).orElseThrow(() -> new PartyNotFoundException(partyId));
+        Party party = openSearchService.findPartyById(partyId);
 
         ShopUtil.fillShopAccount(party.getShopById(shopId).orElseThrow(() -> new ShopNotFoundException(shopId)),
                 accountCreated);
 
-        partyRepository.save(party);
+        openSearchService.updateParty(party);
 
         log.info("End shop accountCreated handling, sequenceId={}, partyId={}, shopId={}, changeId={}",
                 sequenceId, partyId, shopId, changeId);

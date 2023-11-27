@@ -2,12 +2,11 @@ package dev.vality.deanonimus.kafka.handler.party.management.shop;
 
 import dev.vality.damsel.domain.Blocking;
 import dev.vality.damsel.payment_processing.PartyChange;
-import dev.vality.deanonimus.db.PartyRepository;
-import dev.vality.deanonimus.db.exception.PartyNotFoundException;
 import dev.vality.deanonimus.db.exception.ShopNotFoundException;
 import dev.vality.deanonimus.domain.Party;
 import dev.vality.deanonimus.domain.Shop;
 import dev.vality.deanonimus.kafka.handler.party.management.PartyManagementHandler;
+import dev.vality.deanonimus.service.OpenSearchService;
 import dev.vality.geck.filter.Filter;
 import dev.vality.geck.filter.PathConditionFilter;
 import dev.vality.geck.filter.condition.IsNullCondition;
@@ -24,7 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ShopBlockingHandler implements PartyManagementHandler {
 
-    private final PartyRepository partyRepository;
+    private final OpenSearchService openSearchService;
     private final Filter filter = new PathConditionFilter(new PathConditionRule(
             "shop_blocking",
             new IsNullCondition().not()));
@@ -39,11 +38,11 @@ public class ShopBlockingHandler implements PartyManagementHandler {
         log.info("Start shop blocking handling, sequenceId={}, partyId={}, shopId={}, changeId={}",
                 sequenceId, partyId, shopId, changeId);
 
-        Party party = partyRepository.findById(partyId).orElseThrow(() -> new PartyNotFoundException(partyId));
+        Party party = openSearchService.findPartyById(partyId);
 
         initBlockingFields(blocking, party.getShopById(shopId).orElseThrow(() -> new ShopNotFoundException(shopId)));
 
-        partyRepository.save(party);
+        openSearchService.updateParty(party);
 
         log.info("End shop blocking handling, sequenceId={}, partyId={}, shopId={}, changeId={}",
                 sequenceId, partyId, shopId, changeId);

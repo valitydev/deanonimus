@@ -2,12 +2,14 @@ package dev.vality.deanonimus;
 
 import dev.vality.damsel.deanonimus.SearchHit;
 import dev.vality.damsel.deanonimus.SearchShopHit;
-import dev.vality.deanonimus.db.PartyRepository;
+import dev.vality.damsel.deanonimus.SearchWalletHit;
 import dev.vality.deanonimus.domain.Party;
 import dev.vality.deanonimus.handler.DeanonimusServiceHandler;
+import dev.vality.deanonimus.service.OpenSearchService;
+import lombok.SneakyThrows;
 import org.apache.thrift.TException;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.opensearch.client.opensearch.OpenSearchClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -21,7 +23,10 @@ public class ReadTest extends AbstractIntegrationTest {
     Integer responseLimit;
 
     @Autowired
-    PartyRepository partyRepository;
+    OpenSearchService openSearchService;
+
+    @Autowired
+    OpenSearchClient client;
 
     @Autowired
     DeanonimusServiceHandler deanonimusServiceHandler;
@@ -32,18 +37,16 @@ public class ReadTest extends AbstractIntegrationTest {
     private static final String URL = "http://url.com";
     private static final String CONTRACT = "contract";
     private static final String CONTRACTOR = "contractor";
+    private static final String WALLET = "wallet";
+    private static final String WALLET_NAME = "wallet_name";
     private static final String INN = "1234234123";
     private static final String ACCOUNT = "9999999999";
 
-    @BeforeEach
-    void setUp() {
-        partyRepository.deleteAll();
-    }
 
     @Test
     void searchByPartyId() throws TException {
         givenParty(PARTY, EMAIL);
-
+        refreshIndices();
         List<SearchHit> searchHits = deanonimusServiceHandler.searchParty(PARTY);
 
         assertFalse(searchHits.isEmpty());
@@ -58,7 +61,7 @@ public class ReadTest extends AbstractIntegrationTest {
         givenParty(PARTY + "-test-rofl", EMAIL + "3");
         givenParty(PARTY + "-test-ricardo", EMAIL + "4");
         givenParty(PARTY + "-test-milos", EMAIL + "5");
-
+        refreshIndices();
         List<SearchHit> searchHits = deanonimusServiceHandler.searchParty(PARTY + "-test-lol");
 
         assertEquals(1, searchHits.size());
@@ -67,7 +70,7 @@ public class ReadTest extends AbstractIntegrationTest {
     @Test
     void searchByPartyEmail() throws TException {
         givenParty(PARTY, EMAIL);
-
+        refreshIndices();
         List<SearchHit> searchHits = deanonimusServiceHandler.searchParty(EMAIL);
 
         assertFalse(searchHits.isEmpty());
@@ -79,7 +82,7 @@ public class ReadTest extends AbstractIntegrationTest {
     void searchByShopUrl() throws TException {
         Party party = givenParty(PARTY, EMAIL);
         givenShop(party, SHOP, URL);
-
+        refreshIndices();
         List<SearchHit> searchHits = deanonimusServiceHandler.searchParty(URL);
 
         assertFalse(searchHits.isEmpty());
@@ -92,7 +95,7 @@ public class ReadTest extends AbstractIntegrationTest {
     void searchByShopId() throws TException {
         Party party = givenParty(PARTY, EMAIL);
         givenShop(party, SHOP, URL);
-
+        refreshIndices();
         List<SearchHit> searchHits = deanonimusServiceHandler.searchParty(SHOP);
 
         assertFalse(searchHits.isEmpty());
@@ -105,7 +108,7 @@ public class ReadTest extends AbstractIntegrationTest {
     void searchShopByShopId() throws TException {
         Party party = givenParty(PARTY, EMAIL);
         givenShop(party, SHOP, URL);
-
+        refreshIndices();
         List<SearchShopHit> searchShopHits = deanonimusServiceHandler.searchShopText(SHOP);
 
         assertFalse(searchShopHits.isEmpty());
@@ -117,7 +120,7 @@ public class ReadTest extends AbstractIntegrationTest {
     void searchShopByShopUrl() throws TException {
         Party party = givenParty(PARTY, EMAIL);
         givenShop(party, SHOP, URL);
-
+        refreshIndices();
         List<SearchShopHit> searchHits = deanonimusServiceHandler.searchShopText(URL);
 
         assertFalse(searchHits.isEmpty());
@@ -126,11 +129,35 @@ public class ReadTest extends AbstractIntegrationTest {
     }
 
     @Test
+    void searchWalletByName() throws TException {
+        Party party = givenParty(PARTY, EMAIL);
+        givenWallet(party, WALLET, WALLET_NAME);
+        refreshIndices();
+        List<SearchWalletHit> searchHits = deanonimusServiceHandler.searchWalletText(WALLET_NAME);
+
+        assertFalse(searchHits.isEmpty());
+        assertTrue(searchHits.stream()
+                .anyMatch(partySearchHit -> partySearchHit.getWallet().getName().contains(WALLET_NAME)));
+    }
+
+    @Test
+    void searchWalletById() throws TException {
+        Party party = givenParty(PARTY, EMAIL);
+        givenWallet(party, WALLET, WALLET_NAME);
+        refreshIndices();
+        List<SearchWalletHit> searchHits = deanonimusServiceHandler.searchWalletText(WALLET);
+
+        assertFalse(searchHits.isEmpty());
+        assertTrue(searchHits.stream()
+                .anyMatch(partySearchHit -> partySearchHit.getWallet().getId().contains(WALLET)));
+    }
+
+    @Test
     void searchByContractorEmail() throws TException {
         Party party = givenParty(PARTY, null);
         givenRegisteredUserContractor(party, CONTRACTOR, EMAIL);
 
-
+        refreshIndices();
         List<SearchHit> searchHits = deanonimusServiceHandler.searchParty(EMAIL);
 
         assertFalse(searchHits.isEmpty());
@@ -144,7 +171,7 @@ public class ReadTest extends AbstractIntegrationTest {
         Party party = givenParty(PARTY, null);
         givenRussianContractor(party, CONTRACTOR, "ООО \"ЧИ ИЛИ НЕ ЧИ\"", INN, ACCOUNT);
 
-
+        refreshIndices();
         List<SearchHit> searchHits = deanonimusServiceHandler.searchParty("ЧИ");
 
         assertFalse(searchHits.isEmpty());
@@ -159,8 +186,8 @@ public class ReadTest extends AbstractIntegrationTest {
         Party party = givenParty(PARTY, null);
         givenRussianContractor(party, CONTRACTOR, "ООО \"ЧИ ИЛИ НЕ ЧИ\"", INN, ACCOUNT);
 
-
-        List<SearchHit> searchHits = deanonimusServiceHandler.searchParty("ЧИ ДА");
+        refreshIndices();
+        List<SearchHit> searchHits = deanonimusServiceHandler.searchParty("ЧИ ИЛИ");
 
         assertFalse(searchHits.isEmpty());
         assertTrue(searchHits.stream()
@@ -173,7 +200,7 @@ public class ReadTest extends AbstractIntegrationTest {
         Party party = givenParty(PARTY, null);
         givenRussianContractor(party, CONTRACTOR, "ООО \"ЧИ ИЛИ НЕ ЧИ\"", INN, ACCOUNT);
 
-
+        refreshIndices();
         List<SearchHit> searchHits = deanonimusServiceHandler.searchParty("ДА");
 
         assertTrue(searchHits.isEmpty());
@@ -184,7 +211,7 @@ public class ReadTest extends AbstractIntegrationTest {
         Party party = givenParty(PARTY, null);
         givenRussianContractor(party, CONTRACTOR, "ООО \"ЧИ ИЛИ НЕ ЧИ\"", INN, ACCOUNT);
 
-
+        refreshIndices();
         List<SearchHit> searchHits = deanonimusServiceHandler.searchParty(INN);
 
         assertFalse(searchHits.isEmpty());
@@ -199,7 +226,7 @@ public class ReadTest extends AbstractIntegrationTest {
         Party party = givenParty(PARTY, null);
         givenRussianContractor(party, CONTRACTOR, "ООО \"ЧИ ИЛИ НЕ ЧИ\"", INN, ACCOUNT);
 
-
+        refreshIndices();
         List<SearchHit> searchHits = deanonimusServiceHandler.searchParty(INN.substring(0, 6));
 
         assertTrue(searchHits.isEmpty());
@@ -210,7 +237,7 @@ public class ReadTest extends AbstractIntegrationTest {
         Party party = givenParty(PARTY, null);
         givenInternationalContractor(party, CONTRACTOR, "SoMe LeGaL NaMe", "ANOTHER TRADING NAME");
 
-
+        refreshIndices();
         List<SearchHit> searchHits = deanonimusServiceHandler.searchParty("legal");
 
         assertFalse(searchHits.isEmpty());
@@ -224,7 +251,7 @@ public class ReadTest extends AbstractIntegrationTest {
         Party party = givenParty(PARTY, null);
         givenContract(party, CONTRACT, 123, "ДГ-123432", "Василий Пупкин");
 
-
+        refreshIndices();
         List<SearchHit> searchHits = deanonimusServiceHandler.searchParty("ДГ");
 
         assertFalse(searchHits.isEmpty());
@@ -239,7 +266,7 @@ public class ReadTest extends AbstractIntegrationTest {
             Party party = givenParty(i + "", i + EMAIL.substring(EMAIL.indexOf("@")));
             givenShop(party, 9 - i + "", URL + i);
         }
-
+        refreshIndices();
         List<SearchHit> searchHits = deanonimusServiceHandler.searchParty("1");
 
         assertEquals(2, searchHits.size());
@@ -253,7 +280,7 @@ public class ReadTest extends AbstractIntegrationTest {
             Party party = givenParty(i + "", EMAIL);
             givenShop(party, 29 - i + "", URL + i);
         }
-
+        refreshIndices();
         List<SearchHit> searchHits = deanonimusServiceHandler.searchParty("email");
 
         assertEquals((long) responseLimit, searchHits.size());
@@ -269,7 +296,7 @@ public class ReadTest extends AbstractIntegrationTest {
                 null,
                 null,
                 null));
-        partyRepository.save(party);
+        openSearchService.updateParty(party);
     }
 
     private void givenRussianContractor(Party party,
@@ -284,16 +311,21 @@ public class ReadTest extends AbstractIntegrationTest {
                 russianLegalEntityRussianBankAccount,
                 null,
                 null));
-        partyRepository.save(party);
+        openSearchService.updateParty(party);
     }
 
     private void givenShop(Party party, String id, String url) {
         party.addShop(TestData.shop(id, url));
-        partyRepository.save(party);
+        openSearchService.updateParty(party);
+    }
+
+    private void givenWallet(Party party, String id, String name) {
+        party.addWallet(TestData.wallet(id, name));
+        openSearchService.updateParty(party);
     }
 
     private Party givenParty(String id, String email) {
-        return partyRepository.save(TestData.party(id, email));
+        return openSearchService.createParty(TestData.party(id, email));
     }
 
     private void givenInternationalContractor(Party party,
@@ -307,7 +339,7 @@ public class ReadTest extends AbstractIntegrationTest {
                 null,
                 internationalLegalEntityLegalName,
                 internationalLegalEntityTradingName));
-        partyRepository.save(party);
+        openSearchService.updateParty(party);
     }
 
     private void givenContract(Party party,
@@ -319,7 +351,11 @@ public class ReadTest extends AbstractIntegrationTest {
                 termsId,
                 legalAgreementId,
                 reportActSignerFullName));
-        partyRepository.save(party);
+        openSearchService.updateParty(party);
     }
 
+    @SneakyThrows
+    private void refreshIndices() {
+        client.indices().refresh();
+    }
 }

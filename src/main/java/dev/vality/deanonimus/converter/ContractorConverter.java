@@ -2,9 +2,9 @@ package dev.vality.deanonimus.converter;
 
 import dev.vality.damsel.deanonimus.*;
 import dev.vality.deanonimus.domain.Contractor;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
+import javax.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +35,6 @@ public class ContractorConverter {
             case legal_entity -> legal_entity(convertLegalEntity(contractor));
             case private_entity -> private_entity(new PrivateEntity());
             case registered_user -> registered_user(new RegisteredUser(contractor.getRegisteredUserEmail()));
-            default -> throw new IllegalArgumentException("No such contractorType: " + contractor.getType());
         };
     }
 
@@ -43,7 +42,6 @@ public class ContractorConverter {
         return switch (contractor.getLegalEntity()) {
             case international_legal_entity -> buildInternationalLegalEntity(contractor);
             case russian_legal_entity -> buildRussianLegalEntity(contractor);
-            default -> throw new IllegalArgumentException("No such legalEntity " + contractor.getLegalEntity());
         };
     }
 

@@ -1,6 +1,6 @@
 package dev.vality.deanonimus.converter;
 
-import dev.vality.damsel.deanonimus.SearchShopHit;
+import dev.vality.damsel.deanonimus.SearchWalletHit;
 import dev.vality.deanonimus.domain.Party;
 import lombok.RequiredArgsConstructor;
 import org.opensearch.client.opensearch.core.SearchResponse;
@@ -12,18 +12,21 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class SearchHitShopConverter {
+public class SearchHitWalletConverter {
 
-    private final ShopListConverter shopListConverter;
+    private final WalletListConverter walletListConverter;
     private final PartyConverter partyConverter;
 
 
-    public List<SearchShopHit> convert(SearchResponse<Party> searchHits) {
-        List<SearchShopHit> hits = new ArrayList<>();
+    public List<SearchWalletHit> convert(SearchResponse<Party> searchHits) {
+        List<SearchWalletHit> hits = new ArrayList<>();
         for (Hit<Party> searchHit : searchHits.hits().hits()) {
-            hits.addAll(shopListConverter.convert(searchHit.source().getShops()).values()
+            hits.addAll(walletListConverter.convert(searchHit.source().getWallets()).values()
                     .stream()
-                    .map(shop -> new SearchShopHit(searchHit.score(), shop, partyConverter.convert(searchHit.source())))
+                    .map(wallet -> new SearchWalletHit(
+                            searchHit.score(),
+                            wallet,
+                            partyConverter.convert(searchHit.source())))
                     .toList());
         }
 

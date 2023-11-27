@@ -4,12 +4,11 @@ import dev.vality.damsel.domain.ShopLocation;
 import dev.vality.damsel.payment_processing.ClaimEffect;
 import dev.vality.damsel.payment_processing.PartyChange;
 import dev.vality.damsel.payment_processing.ShopEffectUnit;
-import dev.vality.deanonimus.db.PartyRepository;
-import dev.vality.deanonimus.db.exception.PartyNotFoundException;
 import dev.vality.deanonimus.db.exception.ShopNotFoundException;
 import dev.vality.deanonimus.domain.Party;
 import dev.vality.deanonimus.domain.Shop;
 import dev.vality.deanonimus.kafka.handler.party.management.AbstractClaimChangedHandler;
+import dev.vality.deanonimus.service.OpenSearchService;
 import dev.vality.machinegun.eventsink.MachineEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +23,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ShopLocationChangedHandler extends AbstractClaimChangedHandler {
 
-    private final PartyRepository partyRepository;
+    private final OpenSearchService openSearchService;
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
@@ -45,7 +44,7 @@ public class ShopLocationChangedHandler extends AbstractClaimChangedHandler {
         String partyId = event.getSourceId();
         log.info("Start shop locationChanged handling, sequenceId={}, partyId={}, shopId={}, changeId={}",
                 sequenceId, partyId, shopId, changeId);
-        Party party = partyRepository.findById(partyId).orElseThrow(() -> new PartyNotFoundException(partyId));
+        Party party = openSearchService.findPartyById(partyId);
 
         Shop shop = party.getShopById(shopId).orElseThrow(() -> new ShopNotFoundException(shopId));
 
@@ -55,7 +54,7 @@ public class ShopLocationChangedHandler extends AbstractClaimChangedHandler {
             throw new IllegalArgumentException("Illegal shop location " + locationChanged);
         }
 
-        partyRepository.save(party);
+        openSearchService.updateParty(party);
 
         log.info("End shop locationChanged handling, sequenceId={}, partyId={}, shopId={}, changeId={}",
                 sequenceId, partyId, shopId, changeId);
