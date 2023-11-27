@@ -55,7 +55,7 @@
         <dependency>
             <groupId>dev.vality</groupId>
             <artifactId>deanonimus-proto</artifactId>
-            <version>1.38-c54cca0</version>
+            <version>1.40-2a02d87</version>
         </dependency>
         <!--spring-->
         <dependency>

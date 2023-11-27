@@ -16,7 +16,7 @@ public class OpenSearchClientConfig {
 
     @Bean(destroyMethod = "close")
     public RestClient restClient(OpenSearchProperties openSearchProperties) {
-        var httpHost = new HttpHost(openSearchProperties.getHostname(), openSearchProperties.getPort(), "http");
+        var httpHost = new HttpHost(openSearchProperties.getHostname(), openSearchProperties.getPort());
         return RestClient.builder(httpHost).build();
     }
 
