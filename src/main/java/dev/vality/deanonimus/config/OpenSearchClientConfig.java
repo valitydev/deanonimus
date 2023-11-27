@@ -25,7 +25,6 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 
 @Configuration
-@SuppressWarnings("LineLength")
 public class OpenSearchClientConfig {
 
     @Bean(destroyMethod = "close")
@@ -38,7 +37,9 @@ public class OpenSearchClientConfig {
             final var credentialsProvider = new BasicCredentialsProvider();
             credentialsProvider.setCredentials(
                     AuthScope.ANY,
-                    new UsernamePasswordCredentials(openSearchProperties.getUsername(), openSearchProperties.getPassword()));
+                    new UsernamePasswordCredentials(
+                            openSearchProperties.getUsername(),
+                            openSearchProperties.getPassword()));
             restClientBuilder.setHttpClientConfigCallback(httpClientBuilder -> httpClientBuilder
                     .setDefaultCredentialsProvider(credentialsProvider)
                     .setSSLContext(sslContext(openSearchProperties.getCertificate()))
