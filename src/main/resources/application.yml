@@ -41,8 +41,12 @@ spring:
         session.timeout.ms: 30000
 
 opensearch:
-  hostname: "localhost"
+  username: none
+  password: none
+  hostname: localhost
   port: 9200
+  certificate: none
+  sslEnabled: false
 
 info:
   version: '@project.version@'
