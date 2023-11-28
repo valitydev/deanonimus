@@ -1,6 +1,7 @@
 package dev.vality.deanonimus.db;
 
 import dev.vality.deanonimus.domain.Party;
+import dev.vality.deanonimus.domain.Shop;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -55,8 +56,8 @@ public class SearchDaoImpl implements SearchDao {
                                 "contractors.internationalLegalEntityLegalName",
                                 "contractors.internationalLegalEntityTradingName")
                         .query(text)
-                        .type(TextQueryType.Phrase)
                         .build()))
+                .scoreMode(ChildScoreMode.Sum)
                 .build().query();
     }
 
@@ -68,8 +69,8 @@ public class SearchDaoImpl implements SearchDao {
                                 "contracts.legalAgreementId",
                                 "contracts.reportActSignerFullName")
                         .query(text)
-                        .type(TextQueryType.Phrase)
                         .build()))
+                .scoreMode(ChildScoreMode.Sum)
                 .build().query();
     }
 
@@ -78,7 +79,6 @@ public class SearchDaoImpl implements SearchDao {
                 .fields("id",
                         "email")
                 .query(text)
-                .type(TextQueryType.Phrase)
                 .build());
     }
 
@@ -90,8 +90,8 @@ public class SearchDaoImpl implements SearchDao {
                                 "shops.locationUrl",
                                 "shops.detailsName")
                         .query(text)
-                        .type(TextQueryType.Phrase)
                         .build()))
+                .scoreMode(ChildScoreMode.Sum)
                 .build().query();
     }
 
@@ -102,8 +102,8 @@ public class SearchDaoImpl implements SearchDao {
                         .fields("wallets.id",
                                 "wallets.name")
                         .query(text)
-                        .type(TextQueryType.Phrase)
                         .build()))
+                .scoreMode(ChildScoreMode.Sum)
                 .build().query();
     }
 

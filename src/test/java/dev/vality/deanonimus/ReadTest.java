@@ -94,14 +94,17 @@ public class ReadTest extends AbstractIntegrationTest {
     @Test
     void searchByShopId() throws TException {
         Party party = givenParty(PARTY, EMAIL);
-        givenShop(party, SHOP, URL);
+        givenShop(party, SHOP + "kek", URL + "testkek");
+        givenShop(party, SHOP + "lol", URL + "testlol");
         refreshIndices();
-        List<SearchHit> searchHits = deanonimusServiceHandler.searchParty(SHOP);
-
+        List<SearchShopHit> searchHits = deanonimusServiceHandler.searchShopText(SHOP + "kek");
         assertFalse(searchHits.isEmpty());
+        assertEquals(1, searchHits.size());
         assertTrue(searchHits.stream()
                 .anyMatch(partySearchHit -> partySearchHit.getParty().getShops().values().stream()
-                        .anyMatch(shop -> shop.getId().equals(SHOP))));
+                        .anyMatch(shop -> shop.getId().equals(SHOP + "kek"))));
+        searchHits = deanonimusServiceHandler.searchShopText(URL + "test");
+        assertEquals(2, searchHits.size());
     }
 
     @Test

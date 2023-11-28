@@ -9,14 +9,13 @@ import dev.vality.deanonimus.converter.SearchHitShopConverter;
 import dev.vality.deanonimus.converter.SearchHitWalletConverter;
 import dev.vality.deanonimus.db.SearchDao;
 import dev.vality.deanonimus.domain.Party;
+import dev.vality.deanonimus.domain.Shop;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.opensearch.client.opensearch.core.SearchResponse;
 import org.opensearch.client.opensearch.core.search.Hit;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
@@ -48,7 +47,7 @@ public class DeanonimusServiceHandler implements DeanonimusSrv.Iface {
         SearchResponse<Party> searchHits = searchDao.searchParty(text);
         var parties = searchHits.hits().hits().stream().map(Hit::source).collect(toList());
         log.info("Found for shop search parties: {}", parties);
-        var foundSearchHits = searchHitShopConverter.convert(searchHits);
+        var foundSearchHits = searchHitShopConverter.convert(searchHits, text);
         log.info("Found shop: {}", foundSearchHits);
         return foundSearchHits;
     }
@@ -59,7 +58,7 @@ public class DeanonimusServiceHandler implements DeanonimusSrv.Iface {
         SearchResponse<Party> searchHits = searchDao.searchParty(text);
         var parties = searchHits.hits().hits().stream().map(Hit::source).collect(toList());
         log.info("Found for wallet search parties: {}", parties);
-        var foundSearchHits = searchHitWalletConverter.convert(searchHits);
+        var foundSearchHits = searchHitWalletConverter.convert(searchHits, text);
         log.info("Found wallet: {}", foundSearchHits);
         return foundSearchHits;
     }
