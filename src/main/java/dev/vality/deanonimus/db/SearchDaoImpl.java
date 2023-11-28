@@ -6,16 +6,20 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.opensearch._types.query_dsl.BoolQuery;
-import org.opensearch.client.opensearch._types.query_dsl.MultiMatchQuery;
+import org.opensearch.client.opensearch._types.query_dsl.Operator;
 import org.opensearch.client.opensearch._types.query_dsl.Query;
-import org.opensearch.client.opensearch._types.query_dsl.TextQueryType;
 import org.opensearch.client.opensearch.core.SearchResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
+import static dev.vality.deanonimus.constant.OpenSearchConstants.*;
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
+@SuppressWarnings("LineLength")
 public class SearchDaoImpl implements SearchDao {
 
     @Value("${data.response.limit}")
@@ -27,73 +31,40 @@ public class SearchDaoImpl implements SearchDao {
     @SneakyThrows
     @Override
     public SearchResponse<Party> searchParty(String text) {
-
         BoolQuery queryBuilder = new BoolQuery.Builder()
-                .should(searchPartyFields(text),
-                        searchShopFields(text),
-                        searchContractFields(text),
-                        searchContractorFields(text),
-                        searchWalletFields(text))
+                .should(builder -> builder
+                        .multiMatch(builder1 -> builder1
+                                .operator(Operator.Or)
+                                .fields("id", "email")
+                                .query(text)))
+                .should(builder -> builder
+                        .multiMatch(builder1 -> builder1
+                                .operator(Operator.Or)
+                                .fields("shops.id", "shops.locationUrl", "shops.detailsName")
+                                .query(text)))
+                .should(builder -> builder
+                        .multiMatch(builder1 -> builder1
+                                .operator(Operator.Or)
+                                .fields("contracts.id", "contracts.legalAgreementId", "contracts.reportActSignerFullName")
+                                .query(text)))
+                .should(builder -> builder
+                        .multiMatch(builder1 -> builder1
+                                .operator(Operator.Or)
+                                .fields("contractors.id", "contractors.registeredUserEmail", "contractors.russianLegalEntityRegisteredName", "contractors.russianLegalEntityInn", "contractors.russianLegalEntityRussianBankAccount", "contractors.internationalLegalEntityLegalName", "contractors.internationalLegalEntityTradingName")
+                                .query(text)))
+                .should(builder -> builder
+                        .multiMatch(builder1 -> builder1
+                                .operator(Operator.Or)
+                                .fields("wallets.id", "wallets.name")
+                                .query(text)))
                 .build();
 
         return openSearchClient.search(s -> s
                         .size(responseLimit)
+                        .index(List.of(PARTY_INDEX, SHOP_INDEX, CONTRACT_INDEX, CONTRACTOR_INDEX, WALLET_INDEX))
                         .query(new Query.Builder()
                                 .bool(queryBuilder)
                                 .build()),
                 Party.class);
     }
-
-    private Query searchContractorFields(String text) {
-        return new Query(new MultiMatchQuery.Builder()
-                .fields("contractors.id",
-                        "contractors.registeredUserEmail",
-                        "contractors.russianLegalEntityRegisteredName",
-                        "contractors.russianLegalEntityInn",
-                        "contractors.russianLegalEntityRussianBankAccount",
-                        "contractors.internationalLegalEntityLegalName",
-                        "contractors.internationalLegalEntityTradingName")
-                .query(text)
-                .type(TextQueryType.Phrase)
-                .build());
-    }
-
-    private Query searchContractFields(String text) {
-        return new Query(new MultiMatchQuery.Builder()
-                .fields("contracts.id",
-                        "contracts.legalAgreementId",
-                        "contracts.reportActSignerFullName")
-                .query(text)
-                .type(TextQueryType.Phrase)
-                .build());
-    }
-
-    private Query searchPartyFields(String text) {
-        return new Query(new MultiMatchQuery.Builder()
-                .fields("id",
-                        "email")
-                .query(text)
-                .type(TextQueryType.Phrase)
-                .build());
-    }
-
-    private Query searchShopFields(String text) {
-        return new Query(new MultiMatchQuery.Builder()
-                .fields("shops.id",
-                        "shops.locationUrl",
-                        "shops.detailsName")
-                .query(text)
-                .type(TextQueryType.Phrase)
-                .build());
-    }
-
-    private Query searchWalletFields(String text) {
-        return new Query(new MultiMatchQuery.Builder()
-                .fields("wallets.id",
-                        "wallets.name")
-                .query(text)
-                .type(TextQueryType.Phrase)
-                .build());
-    }
-
 }
