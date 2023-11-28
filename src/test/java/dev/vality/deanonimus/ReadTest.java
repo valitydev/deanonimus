@@ -103,8 +103,8 @@ public class ReadTest extends AbstractIntegrationTest {
         assertTrue(searchHits.stream()
                 .anyMatch(partySearchHit -> partySearchHit.getParty().getShops().values().stream()
                         .anyMatch(shop -> shop.getId().equals(SHOP + "kek"))));
-        searchHits = deanonimusServiceHandler.searchShopText(URL + "test");
-        assertEquals(2, searchHits.size());
+        searchHits = deanonimusServiceHandler.searchShopText(URL + "testlol");
+        assertEquals(1, searchHits.size());
     }
 
     @Test
