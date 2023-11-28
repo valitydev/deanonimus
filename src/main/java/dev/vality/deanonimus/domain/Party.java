@@ -5,6 +5,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.elasticsearch.annotations.Document;
+import org.springframework.data.elasticsearch.annotations.Field;
+import org.springframework.data.elasticsearch.annotations.FieldType;
+import org.springframework.data.elasticsearch.annotations.Setting;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,17 +20,25 @@ import java.util.Optional;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Document(indexName = "party")
+@Setting(settingPath = "/settings/autocomplete-analyzer.json")
 public class Party {
-
+    @Id
+    @Field(type = FieldType.Keyword)
     private String id;
+    @Field(type = FieldType.Text, analyzer = "autocomplete", searchAnalyzer = "standard")
     private String email;
 
     private Blocking blocking;
     private Suspension suspension;
 
+    @Field(type = FieldType.Nested, store = true)
     private List<Contractor> contractors;
+    @Field(type = FieldType.Nested, store = true)
     private List<Contract> contracts;
+    @Field(type = FieldType.Nested, store = true)
     private List<Shop> shops;
+    @Field(type = FieldType.Nested, store = true)
     private List<Wallet> wallets;
 
     public void addShop(Shop shop) {
