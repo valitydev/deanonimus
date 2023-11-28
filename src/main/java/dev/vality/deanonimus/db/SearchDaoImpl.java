@@ -36,27 +36,32 @@ public class SearchDaoImpl implements SearchDao {
                         .multiMatch(builder1 -> builder1
                                 .operator(Operator.Or)
                                 .fields("id", "email")
-                                .query(text)))
+                                .query(text)
+                                .type(TextQueryType.Phrase)))
                 .should(builder -> builder
                         .multiMatch(builder1 -> builder1
                                 .operator(Operator.Or)
                                 .fields("shops.id", "shops.locationUrl", "shops.detailsName")
-                                .query(text)))
+                                .query(text)
+                                .type(TextQueryType.Phrase)))
                 .should(builder -> builder
                         .multiMatch(builder1 -> builder1
                                 .operator(Operator.Or)
                                 .fields("contracts.id", "contracts.legalAgreementId", "contracts.reportActSignerFullName")
-                                .query(text)))
+                                .query(text)
+                                .type(TextQueryType.Phrase)))
                 .should(builder -> builder
                         .multiMatch(builder1 -> builder1
                                 .operator(Operator.Or)
                                 .fields("contractors.id", "contractors.registeredUserEmail", "contractors.russianLegalEntityRegisteredName", "contractors.russianLegalEntityInn", "contractors.russianLegalEntityRussianBankAccount", "contractors.internationalLegalEntityLegalName", "contractors.internationalLegalEntityTradingName")
-                                .query(text)))
+                                .query(text)
+                                .type(TextQueryType.Phrase)))
                 .should(builder -> builder
                         .multiMatch(builder1 -> builder1
                                 .operator(Operator.Or)
                                 .fields("wallets.id", "wallets.name")
-                                .query(text)))
+                                .query(text)
+                                .type(TextQueryType.Phrase)))
                 .build();
 
         return openSearchClient.search(s -> s
