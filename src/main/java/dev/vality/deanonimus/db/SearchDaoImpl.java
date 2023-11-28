@@ -61,7 +61,7 @@ public class SearchDaoImpl implements SearchDao {
 
         return openSearchClient.search(s -> s
                         .size(responseLimit)
-                        .index(List.of(PARTY_INDEX, SHOP_INDEX, CONTRACT_INDEX, CONTRACTOR_INDEX, WALLET_INDEX))
+                        .index(PARTY_INDEX)
                         .query(new Query.Builder()
                                 .bool(queryBuilder)
                                 .build()),
