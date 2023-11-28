@@ -18,11 +18,14 @@ public class SearchHitShopConverter {
     private final PartyConverter partyConverter;
 
 
-    public List<SearchShopHit> convert(SearchResponse<Party> searchHits) {
+    public List<SearchShopHit> convert(SearchResponse<Party> searchHits, String text) {
         List<SearchShopHit> hits = new ArrayList<>();
         for (Hit<Party> searchHit : searchHits.hits().hits()) {
             hits.addAll(shopListConverter.convert(searchHit.source().getShops()).values()
                     .stream()
+                    .filter(shop -> shop.getId().contains(text)
+                            || shop.getLocation().getUrl().contains(text)
+                            || shop.getDetails().getName().contains(text))
                     .map(shop -> new SearchShopHit(searchHit.score(), shop, partyConverter.convert(searchHit.source())))
                     .toList());
         }

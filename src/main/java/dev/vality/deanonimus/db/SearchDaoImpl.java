@@ -1,6 +1,7 @@
 package dev.vality.deanonimus.db;
 
 import dev.vality.deanonimus.domain.Party;
+import dev.vality.deanonimus.domain.Shop;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -57,6 +58,7 @@ public class SearchDaoImpl implements SearchDao {
                         .query(text)
                         .type(TextQueryType.Phrase)
                         .build()))
+                .scoreMode(ChildScoreMode.Sum)
                 .build().query();
     }
 
@@ -70,6 +72,7 @@ public class SearchDaoImpl implements SearchDao {
                         .query(text)
                         .type(TextQueryType.Phrase)
                         .build()))
+                .scoreMode(ChildScoreMode.Sum)
                 .build().query();
     }
 
@@ -92,6 +95,7 @@ public class SearchDaoImpl implements SearchDao {
                         .query(text)
                         .type(TextQueryType.Phrase)
                         .build()))
+                .scoreMode(ChildScoreMode.Sum)
                 .build().query();
     }
 
@@ -104,6 +108,7 @@ public class SearchDaoImpl implements SearchDao {
                         .query(text)
                         .type(TextQueryType.Phrase)
                         .build()))
+                .scoreMode(ChildScoreMode.Sum)
                 .build().query();
     }
 
