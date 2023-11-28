@@ -25,7 +25,7 @@ import static dev.vality.deanonimus.constant.OpenSearchConstants.PARTY_INDEX;
 @SuppressWarnings("LineLength")
 public class SearchDaoImpl implements SearchDao {
 
-    private static final TextQueryType TEXT_QUERY_TYPE = TextQueryType.BestFields;
+    private static final TextQueryType TEXT_QUERY_TYPE = TextQueryType.Phrase;
     private static final Operator OPERATOR = Operator.Or;
     private static final int DEFAULT_SLOP = 0;
     private static final int DEFAULT_PREFIX_LENGTH = 0;
