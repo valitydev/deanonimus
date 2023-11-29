@@ -1,7 +1,6 @@
 package dev.vality.deanonimus.db;
 
 import dev.vality.deanonimus.domain.Party;
-import dev.vality.deanonimus.domain.Shop;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
