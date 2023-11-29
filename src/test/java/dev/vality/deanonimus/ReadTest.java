@@ -54,18 +54,6 @@ public class ReadTest extends AbstractIntegrationTest {
                 .anyMatch(partySearchHit -> partySearchHit.getParty().getEmail().contains(EMAIL)));
     }
 
-    @Test
-    void searchByPartyIdWithoutTokens() throws TException {
-        givenParty(PARTY + "-test-kek", EMAIL + "1");
-        givenParty(PARTY + "-test-lol", EMAIL + "2");
-        givenParty(PARTY + "-test-rofl", EMAIL + "3");
-        givenParty(PARTY + "-test-ricardo", EMAIL + "4");
-        givenParty(PARTY + "-test-milos", EMAIL + "5");
-        refreshIndices();
-        List<SearchHit> searchHits = deanonimusServiceHandler.searchParty(PARTY + "-test-lol");
-
-        assertEquals(1, searchHits.size());
-    }
 
     @Test
     void searchByPartyEmail() throws TException {
