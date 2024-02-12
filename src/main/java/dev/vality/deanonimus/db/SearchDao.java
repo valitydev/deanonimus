@@ -7,4 +7,8 @@ public interface SearchDao {
 
     SearchResponse<Party> searchParty(String text);
 
+    SearchResponse<Party> searchShop(String text);
+
+    SearchResponse<Party> searchWallet(String text);
+
 }

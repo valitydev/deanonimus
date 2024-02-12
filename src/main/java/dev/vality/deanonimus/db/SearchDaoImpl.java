@@ -22,13 +22,35 @@ public class SearchDaoImpl implements SearchDao {
 
     private final OpenSearchClient openSearchClient;
 
-    @SneakyThrows
     @Override
     public SearchResponse<Party> searchParty(String text) {
         var queryBuilder = new BoolQuery.Builder()
                 .should(searchBestFields(text, keywords()),
                         searchPhrasePrefix(text, fields()))
                 .build();
+        return search(queryBuilder);
+    }
+
+    @Override
+    public SearchResponse<Party> searchShop(String text) {
+        var queryBuilder = new BoolQuery.Builder()
+                .should(searchBestFields(text, List.of("shops.id.keyword")),
+                        searchPhrasePrefix(text, List.of("shops.locationUrl", "shops.detailsName")))
+                .build();
+        return search(queryBuilder);
+    }
+
+    @Override
+    public SearchResponse<Party> searchWallet(String text) {
+        var queryBuilder = new BoolQuery.Builder()
+                .should(searchBestFields(text, List.of("wallets.id.keyword")),
+                        searchPhrasePrefix(text, List.of("wallets.name")))
+                .build();
+        return search(queryBuilder);
+    }
+
+    @SneakyThrows
+    private SearchResponse<Party> search(BoolQuery queryBuilder) {
         return openSearchClient.search(
                 s -> s
                         .size(responseLimit)

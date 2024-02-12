@@ -116,7 +116,7 @@ public class ReadTest extends AbstractIntegrationTest {
     }
 
     @Test
-    void searchByShopUrl() throws TException {
+    void searchPartyByShopUrl() throws TException {
         Party party = givenParty(PARTY, EMAIL);
         givenShop(party, SHOP, URL);
         refreshIndices();
@@ -129,7 +129,46 @@ public class ReadTest extends AbstractIntegrationTest {
     }
 
     @Test
-    void searchByShopId() throws TException {
+    void searchPartyByShopName() throws TException {
+        var party = givenParty(PARTY, EMAIL);
+        givenShop(party, SHOP, URL, "S2P_BRL");
+        refreshIndices();
+        var searchHits = deanonimusServiceHandler.searchParty("s2p");
+
+        assertFalse(searchHits.isEmpty());
+        assertTrue(searchHits.stream()
+                .anyMatch(partySearchHit -> partySearchHit.getParty().getShops().values().stream()
+                        .anyMatch(shop -> shop.getDetails().getName().contains("S2P"))));
+    }
+
+    @Test
+    void searchPartyByWalletName() throws TException {
+        var party = givenParty(PARTY, EMAIL);
+        givenWallet(party, WALLET, "S2P");
+        refreshIndices();
+        var searchHits = deanonimusServiceHandler.searchParty("s2p");
+
+        assertFalse(searchHits.isEmpty());
+        assertTrue(searchHits.stream()
+                .anyMatch(partySearchHit -> partySearchHit.getParty().getWallets().values().stream()
+                        .anyMatch(o -> o.getName().contains("S2P"))));
+    }
+
+    @Test
+    void searchShopTextByShopName() throws TException {
+        var party = givenParty(PARTY, EMAIL);
+        givenShop(party, SHOP, URL, "S2P_BRL");
+        refreshIndices();
+        var searchHits = deanonimusServiceHandler.searchShopText("s2p");
+
+        assertFalse(searchHits.isEmpty());
+        assertTrue(searchHits.stream()
+                .anyMatch(partySearchHit -> partySearchHit.getParty().getShops().values().stream()
+                        .anyMatch(shop -> shop.getDetails().getName().contains("S2P"))));
+    }
+
+    @Test
+    void searchShopTextByDiffShop() throws TException {
         Party party = givenParty(PARTY, EMAIL);
         givenShop(party, SHOP + "kek", URL + "testkek");
         givenShop(party, SHOP + "lol", URL + "testlol");
@@ -145,7 +184,7 @@ public class ReadTest extends AbstractIntegrationTest {
     }
 
     @Test
-    void searchShopByShopId() throws TException {
+    void searchShopTextByShopId() throws TException {
         Party party = givenParty(PARTY, EMAIL);
         givenShop(party, SHOP, URL);
         refreshIndices();
@@ -157,7 +196,7 @@ public class ReadTest extends AbstractIntegrationTest {
     }
 
     @Test
-    void searchShopByShopUrl() throws TException {
+    void searchShopTextByShopUrl() throws TException {
         Party party = givenParty(PARTY, EMAIL);
         givenShop(party, SHOP, URL);
         refreshIndices();
@@ -169,7 +208,7 @@ public class ReadTest extends AbstractIntegrationTest {
     }
 
     @Test
-    void searchWalletByName() throws TException {
+    void searchWalletTextByName() throws TException {
         Party party = givenParty(PARTY, EMAIL);
         givenWallet(party, WALLET, WALLET_NAME);
         refreshIndices();
@@ -181,7 +220,7 @@ public class ReadTest extends AbstractIntegrationTest {
     }
 
     @Test
-    void searchWalletById() throws TException {
+    void searchWalletTextById() throws TException {
         Party party = givenParty(PARTY, EMAIL);
         givenWallet(party, WALLET, WALLET_NAME);
         refreshIndices();
@@ -383,7 +422,12 @@ public class ReadTest extends AbstractIntegrationTest {
     }
 
     private void givenShop(Party party, String id, String url) {
-        party.addShop(TestData.shop(id, url));
+        party.addShop(TestData.shop(id, url, "name"));
+        openSearchService.updateParty(party);
+    }
+
+    private void givenShop(Party party, String id, String url, String detailsName) {
+        party.addShop(TestData.shop(id, url, detailsName));
         openSearchService.updateParty(party);
     }
 

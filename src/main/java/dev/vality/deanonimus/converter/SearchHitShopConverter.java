@@ -4,11 +4,12 @@ import dev.vality.damsel.deanonimus.SearchShopHit;
 import dev.vality.deanonimus.domain.Party;
 import lombok.RequiredArgsConstructor;
 import org.opensearch.client.opensearch.core.SearchResponse;
-import org.opensearch.client.opensearch.core.search.Hit;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.apache.commons.lang3.StringUtils.containsIgnoreCase;
 
 @Component
 @RequiredArgsConstructor
@@ -19,17 +20,16 @@ public class SearchHitShopConverter {
 
 
     public List<SearchShopHit> convert(SearchResponse<Party> searchHits, String text) {
-        List<SearchShopHit> hits = new ArrayList<>();
-        for (Hit<Party> searchHit : searchHits.hits().hits()) {
+        var hits = new ArrayList<SearchShopHit>();
+        for (var searchHit : searchHits.hits().hits()) {
             hits.addAll(shopListConverter.convert(searchHit.source().getShops()).values()
                     .stream()
-                    .filter(shop -> shop.getId().contains(text)
-                            || shop.getLocation().getUrl().contains(text)
-                            || shop.getDetails().getName().contains(text))
+                    .filter(shop -> containsIgnoreCase(shop.getId(), text)
+                            || containsIgnoreCase(shop.getLocation().getUrl(), text)
+                            || containsIgnoreCase(shop.getDetails().getName(), text))
                     .map(shop -> new SearchShopHit(searchHit.score(), shop, partyConverter.convert(searchHit.source())))
                     .toList());
         }
-
         return hits;
     }
 }

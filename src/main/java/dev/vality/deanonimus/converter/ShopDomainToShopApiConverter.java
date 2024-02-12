@@ -12,7 +12,7 @@ public class ShopDomainToShopApiConverter implements Converter<dev.vality.deanon
 
     @Override
     public Shop convert(dev.vality.deanonimus.domain.Shop shopDomain) {
-        Shop shop = new Shop()
+        var shop = new Shop()
                 .setId(shopDomain.getId())
                 .setBlocking(EnumUtils.convertBlocking(shopDomain.getBlocking()))
                 .setSuspension(EnumUtils.convertSuspension(shopDomain.getSuspension()))
@@ -20,16 +20,12 @@ public class ShopDomainToShopApiConverter implements Converter<dev.vality.deanon
                 .setContractId(shopDomain.getContractId())
                 .setDetails(new ShopDetails()
                         .setName(shopDomain.getDetailsName())
-                        .setDescription(shopDomain.getDetailsDescription())
-                )
+                        .setDescription(shopDomain.getDetailsDescription()))
                 .setPayoutToolId(shopDomain.getPayoutToolId());
-
         setAccount(shopDomain, shop);
-
-        ShopLocation shopLocation = new ShopLocation();
+        var shopLocation = new ShopLocation();
         shopLocation.setUrl(shopDomain.getLocationUrl());
         shop.setLocation(shopLocation);
-
         if (shopDomain.getPayoutScheduleId() != null) {
             shop.setPayoutSchedule(new BusinessScheduleRef(shopDomain.getPayoutScheduleId()));
         }
@@ -42,8 +38,7 @@ public class ShopDomainToShopApiConverter implements Converter<dev.vality.deanon
                     new CurrencyRef(shopDomain.getAccountCurrencyCode()),
                     shopDomain.getAccountSettlement(),
                     shopDomain.getAccountGuarantee(),
-                    shopDomain.getAccountPayout()
-            ));
+                    shopDomain.getAccountPayout()));
         }
     }
 }

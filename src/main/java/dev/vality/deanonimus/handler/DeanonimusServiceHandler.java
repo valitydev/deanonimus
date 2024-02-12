@@ -8,11 +8,8 @@ import dev.vality.deanonimus.converter.SearchHitConverter;
 import dev.vality.deanonimus.converter.SearchHitShopConverter;
 import dev.vality.deanonimus.converter.SearchHitWalletConverter;
 import dev.vality.deanonimus.db.SearchDao;
-import dev.vality.deanonimus.domain.Party;
-import dev.vality.deanonimus.domain.Shop;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.opensearch.client.opensearch.core.SearchResponse;
 import org.opensearch.client.opensearch.core.search.Hit;
 import org.springframework.stereotype.Component;
 
@@ -33,7 +30,7 @@ public class DeanonimusServiceHandler implements DeanonimusSrv.Iface {
     @Override
     public List<SearchHit> searchParty(String text) {
         log.info("Incoming request for party with text: {}", text);
-        SearchResponse<Party> searchHits = searchDao.searchParty(text);
+        var searchHits = searchDao.searchParty(text);
         var parties = searchHits.hits().hits().stream().map(Hit::source).collect(toList());
         log.info("Found for party search parties: {}", parties);
         var foundSearchHits = searchHitConverter.convert(searchHits);
@@ -44,7 +41,7 @@ public class DeanonimusServiceHandler implements DeanonimusSrv.Iface {
     @Override
     public List<SearchShopHit> searchShopText(String text) {
         log.info("Incoming request for shop with text: {}", text);
-        SearchResponse<Party> searchHits = searchDao.searchParty(text);
+        var searchHits = searchDao.searchShop(text);
         var parties = searchHits.hits().hits().stream().map(Hit::source).collect(toList());
         log.info("Found for shop search parties: {}", parties);
         var foundSearchHits = searchHitShopConverter.convert(searchHits, text);
@@ -55,7 +52,7 @@ public class DeanonimusServiceHandler implements DeanonimusSrv.Iface {
     @Override
     public List<SearchWalletHit> searchWalletText(String text) {
         log.info("Incoming request for wallets with text: {}", text);
-        SearchResponse<Party> searchHits = searchDao.searchParty(text);
+        var searchHits = searchDao.searchWallet(text);
         var parties = searchHits.hits().hits().stream().map(Hit::source).collect(toList());
         log.info("Found for wallet search parties: {}", parties);
         var foundSearchHits = searchHitWalletConverter.convert(searchHits, text);

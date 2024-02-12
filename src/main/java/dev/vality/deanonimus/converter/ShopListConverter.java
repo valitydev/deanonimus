@@ -24,6 +24,4 @@ public class ShopListConverter {
     private Map.Entry<String, Shop> convertToEntity(dev.vality.deanonimus.domain.Shop shopDomain) {
         return Map.entry(shopDomain.getId(), Objects.requireNonNull(converter.convert(shopDomain)));
     }
-
-
 }
