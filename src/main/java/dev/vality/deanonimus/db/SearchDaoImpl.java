@@ -10,7 +10,7 @@ import org.opensearch.client.opensearch.core.SearchResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import static dev.vality.deanonimus.constant.OpenSearchConstants.*;
+import java.util.List;
 
 @Slf4j
 @Component
@@ -18,24 +18,19 @@ import static dev.vality.deanonimus.constant.OpenSearchConstants.*;
 public class SearchDaoImpl implements SearchDao {
 
     @Value("${data.response.limit}")
-    Integer responseLimit;
+    private Integer responseLimit;
 
     private final OpenSearchClient openSearchClient;
-
 
     @SneakyThrows
     @Override
     public SearchResponse<Party> searchParty(String text) {
-
-        BoolQuery queryBuilder = new BoolQuery.Builder()
-                .should(searchPartyFields(text),
-                        searchShopFields(text),
-                        searchContractFields(text),
-                        searchContractorFields(text),
-                        searchWalletFields(text))
+        var queryBuilder = new BoolQuery.Builder()
+                .should(searchBestFields(text, keywords()),
+                        searchPhrasePrefix(text, fields()))
                 .build();
-
-        return openSearchClient.search(s -> s
+        return openSearchClient.search(
+                s -> s
                         .size(responseLimit)
                         .query(new Query.Builder()
                                 .bool(queryBuilder)
@@ -43,72 +38,46 @@ public class SearchDaoImpl implements SearchDao {
                 Party.class);
     }
 
-    private Query searchContractorFields(String text) {
-        return new NestedQuery.Builder()
-                .path(CONTRACTOR_INDEX)
-                .query(new Query(new MultiMatchQuery.Builder()
-                        .fields("contractors.id",
-                                "contractors.registeredUserEmail",
-                                "contractors.russianLegalEntityRegisteredName",
-                                "contractors.russianLegalEntityInn",
-                                "contractors.russianLegalEntityRussianBankAccount",
-                                "contractors.internationalLegalEntityLegalName",
-                                "contractors.internationalLegalEntityTradingName")
-                        .query(text)
-                        .type(TextQueryType.Phrase)
-                        .build()))
-                .scoreMode(ChildScoreMode.Sum)
-                .build().query();
+    private List<String> keywords() {
+        return List.of(
+                "id.keyword",
+                "contractors.id.keyword",
+                "contractors.russianLegalEntityInn.keyword",
+                "contractors.russianLegalEntityRussianBankAccount.keyword",
+                "contracts.id.keyword",
+                "shops.id.keyword",
+                "wallets.id.keyword");
     }
 
-    private Query searchContractFields(String text) {
-        return new NestedQuery.Builder()
-                .path(CONTRACT_INDEX)
-                .query(new Query(new MultiMatchQuery.Builder()
-                        .fields("contracts.id",
-                                "contracts.legalAgreementId",
-                                "contracts.reportActSignerFullName")
-                        .query(text)
-                        .type(TextQueryType.Phrase)
-                        .build()))
-                .scoreMode(ChildScoreMode.Sum)
-                .build().query();
+    private List<String> fields() {
+        return List.of(
+                "email",
+                "contractors.registeredUserEmail",
+                "contractors.russianLegalEntityRegisteredName",
+                "contractors.internationalLegalEntityLegalName",
+                "contractors.internationalLegalEntityTradingName",
+                "contracts.legalAgreementId",
+                "contracts.reportActSignerFullName",
+                "shops.locationUrl",
+                "shops.detailsName",
+                "wallets.name");
     }
 
-    private Query searchPartyFields(String text) {
+    private Query searchBestFields(String text, List<String> fields) {
         return new Query(new MultiMatchQuery.Builder()
-                .fields("id",
-                        "email")
+                .fields(fields)
                 .query(text)
-                .type(TextQueryType.Phrase)
+                .type(TextQueryType.BestFields)
+                .operator(Operator.Or)
                 .build());
     }
 
-    private Query searchShopFields(String text) {
-        return new NestedQuery.Builder()
-                .path(SHOP_INDEX)
-                .query(new Query(new MultiMatchQuery.Builder()
-                        .fields("shops.id",
-                                "shops.locationUrl",
-                                "shops.detailsName")
-                        .query(text)
-                        .type(TextQueryType.Phrase)
-                        .build()))
-                .scoreMode(ChildScoreMode.Sum)
-                .build().query();
+    private Query searchPhrasePrefix(String text, List<String> fields) {
+        return new Query(new MultiMatchQuery.Builder()
+                .fields(fields)
+                .query(text)
+                .type(TextQueryType.PhrasePrefix)
+                .operator(Operator.Or)
+                .build());
     }
-
-    private Query searchWalletFields(String text) {
-        return new NestedQuery.Builder()
-                .path(WALLET_INDEX)
-                .query(new Query(new MultiMatchQuery.Builder()
-                        .fields("wallets.id",
-                                "wallets.name")
-                        .query(text)
-                        .type(TextQueryType.Phrase)
-                        .build()))
-                .scoreMode(ChildScoreMode.Sum)
-                .build().query();
-    }
-
 }

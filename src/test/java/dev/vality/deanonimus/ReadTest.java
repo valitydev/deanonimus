@@ -8,13 +8,19 @@ import dev.vality.deanonimus.handler.DeanonimusServiceHandler;
 import dev.vality.deanonimus.service.OpenSearchService;
 import lombok.SneakyThrows;
 import org.apache.thrift.TException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opensearch.client.opensearch.OpenSearchClient;
+import org.opensearch.client.opensearch.indices.DeleteIndexRequest;
+import org.opensearch.client.opensearch.indices.ExistsRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 
+import static dev.vality.deanonimus.constant.OpenSearchConstants.PARTY_INDEX;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ReadTest extends AbstractIntegrationTest {
@@ -42,6 +48,13 @@ public class ReadTest extends AbstractIntegrationTest {
     private static final String INN = "1234234123";
     private static final String ACCOUNT = "9999999999";
 
+    @BeforeEach
+    void setUp() throws IOException {
+        var indices = client.indices();
+        if (indices.exists(new ExistsRequest.Builder().index(PARTY_INDEX).build()).value()) {
+            indices.delete(new DeleteIndexRequest.Builder().index(PARTY_INDEX).build());
+        }
+    }
 
     @Test
     void searchByPartyId() throws TException {
@@ -52,6 +65,30 @@ public class ReadTest extends AbstractIntegrationTest {
         assertFalse(searchHits.isEmpty());
         assertTrue(searchHits.stream()
                 .anyMatch(partySearchHit -> partySearchHit.getParty().getEmail().contains(EMAIL)));
+    }
+
+    @Test
+    void searchByPartyIdAdds() throws TException {
+        var id = UUID.randomUUID().toString();
+        var mail = "asd zxc fgh";
+        givenParty(id, mail);
+        refreshIndices();
+        var searchHits = deanonimusServiceHandler.searchParty(mail);
+        assertFalse(searchHits.isEmpty());
+        assertTrue(searchHits.stream()
+                .anyMatch(partySearchHit -> partySearchHit.getParty().getEmail().contains(mail)));
+        searchHits = deanonimusServiceHandler.searchParty(id);
+        assertFalse(searchHits.isEmpty());
+        assertTrue(searchHits.stream()
+                .anyMatch(partySearchHit -> partySearchHit.getParty().getEmail().contains(mail)));
+        // match partial field
+        searchHits = deanonimusServiceHandler.searchParty("asd z");
+        assertFalse(searchHits.isEmpty());
+        assertTrue(searchHits.stream()
+                .anyMatch(partySearchHit -> partySearchHit.getParty().getEmail().contains(mail)));
+        // for keyword match only full field
+        searchHits = deanonimusServiceHandler.searchParty(id.substring(0, 8));
+        assertTrue(searchHits.isEmpty());
     }
 
     @Test
@@ -167,6 +204,34 @@ public class ReadTest extends AbstractIntegrationTest {
         assertTrue(searchHits.stream()
                 .anyMatch(partySearchHit -> partySearchHit.getParty().getContractors().get(CONTRACTOR).getContractor()
                         .getRegisteredUser().getEmail().contains(EMAIL)));
+    }
+
+    @Test
+    void searchByContractorEmailAdds() throws TException {
+        var id = UUID.randomUUID().toString();
+        var mail = "asd zxc fgh";
+        var party = givenParty(PARTY, null);
+        givenRegisteredUserContractor(party, id, mail);
+        refreshIndices();
+        var searchHits = deanonimusServiceHandler.searchParty(mail);
+        assertFalse(searchHits.isEmpty());
+        assertTrue(searchHits.stream()
+                .anyMatch(partySearchHit -> partySearchHit.getParty().getContractors().get(id).getContractor()
+                        .getRegisteredUser().getEmail().contains(mail)));
+        searchHits = deanonimusServiceHandler.searchParty(id);
+        assertFalse(searchHits.isEmpty());
+        assertTrue(searchHits.stream()
+                .anyMatch(partySearchHit -> partySearchHit.getParty().getContractors().get(id).getContractor()
+                        .getRegisteredUser().getEmail().contains(mail)));
+        // match partial field
+        searchHits = deanonimusServiceHandler.searchParty("asd z");
+        assertFalse(searchHits.isEmpty());
+        assertTrue(searchHits.stream()
+                .anyMatch(partySearchHit -> partySearchHit.getParty().getContractors().get(id).getContractor()
+                        .getRegisteredUser().getEmail().contains(mail)));
+        // for keyword match only full field
+        searchHits = deanonimusServiceHandler.searchParty(id.substring(0, 8));
+        assertTrue(searchHits.isEmpty());
     }
 
     @Test
@@ -356,6 +421,7 @@ public class ReadTest extends AbstractIntegrationTest {
                 reportActSignerFullName));
         openSearchService.updateParty(party);
     }
+
 
     @SneakyThrows
     private void refreshIndices() {
