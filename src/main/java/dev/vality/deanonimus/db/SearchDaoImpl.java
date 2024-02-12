@@ -31,24 +31,6 @@ public class SearchDaoImpl implements SearchDao {
         return search(queryBuilder);
     }
 
-    @Override
-    public SearchResponse<Party> searchShop(String text) {
-        var queryBuilder = new BoolQuery.Builder()
-                .should(searchBestFields(text, List.of("shops.id.keyword")),
-                        searchPhrasePrefix(text, List.of("shops.locationUrl", "shops.detailsName")))
-                .build();
-        return search(queryBuilder);
-    }
-
-    @Override
-    public SearchResponse<Party> searchWallet(String text) {
-        var queryBuilder = new BoolQuery.Builder()
-                .should(searchBestFields(text, List.of("wallets.id.keyword")),
-                        searchPhrasePrefix(text, List.of("wallets.name")))
-                .build();
-        return search(queryBuilder);
-    }
-
     @SneakyThrows
     private SearchResponse<Party> search(BoolQuery queryBuilder) {
         return openSearchClient.search(
@@ -63,26 +45,26 @@ public class SearchDaoImpl implements SearchDao {
     private List<String> keywords() {
         return List.of(
                 "id.keyword",
+                "shops.id.keyword",
+                "wallets.id.keyword",
                 "contractors.id.keyword",
                 "contractors.russianLegalEntityInn.keyword",
                 "contractors.russianLegalEntityRussianBankAccount.keyword",
-                "contracts.id.keyword",
-                "shops.id.keyword",
-                "wallets.id.keyword");
+                "contracts.id.keyword");
     }
 
     private List<String> fields() {
         return List.of(
                 "email",
+                "shops.locationUrl",
+                "shops.detailsName",
+                "wallets.name",
                 "contractors.registeredUserEmail",
                 "contractors.russianLegalEntityRegisteredName",
                 "contractors.internationalLegalEntityLegalName",
                 "contractors.internationalLegalEntityTradingName",
                 "contracts.legalAgreementId",
-                "contracts.reportActSignerFullName",
-                "shops.locationUrl",
-                "shops.detailsName",
-                "wallets.name");
+                "contracts.reportActSignerFullName");
     }
 
     private Query searchBestFields(String text, List<String> fields) {

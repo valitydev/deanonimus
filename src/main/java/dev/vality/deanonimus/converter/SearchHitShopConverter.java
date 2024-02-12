@@ -18,7 +18,6 @@ public class SearchHitShopConverter {
     private final ShopListConverter shopListConverter;
     private final PartyConverter partyConverter;
 
-
     public List<SearchShopHit> convert(SearchResponse<Party> searchHits, String text) {
         var hits = new ArrayList<SearchShopHit>();
         for (var searchHit : searchHits.hits().hits()) {

@@ -41,7 +41,7 @@ public class DeanonimusServiceHandler implements DeanonimusSrv.Iface {
     @Override
     public List<SearchShopHit> searchShopText(String text) {
         log.info("Incoming request for shop with text: {}", text);
-        var searchHits = searchDao.searchShop(text);
+        var searchHits = searchDao.searchParty(text);
         var parties = searchHits.hits().hits().stream().map(Hit::source).collect(toList());
         log.info("Found for shop search parties: {}", parties);
         var foundSearchHits = searchHitShopConverter.convert(searchHits, text);
@@ -52,7 +52,7 @@ public class DeanonimusServiceHandler implements DeanonimusSrv.Iface {
     @Override
     public List<SearchWalletHit> searchWalletText(String text) {
         log.info("Incoming request for wallets with text: {}", text);
-        var searchHits = searchDao.searchWallet(text);
+        var searchHits = searchDao.searchParty(text);
         var parties = searchHits.hits().hits().stream().map(Hit::source).collect(toList());
         log.info("Found for wallet search parties: {}", parties);
         var foundSearchHits = searchHitWalletConverter.convert(searchHits, text);
