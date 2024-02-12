@@ -26,7 +26,7 @@ public abstract class TestData {
 
     public static final String SOURCE_ID_ONE = "source";
 
-    public static dev.vality.deanonimus.domain.Shop shop(String id, String url) {
+    public static dev.vality.deanonimus.domain.Shop shop(String id, String url, String detailsName) {
         return dev.vality.deanonimus.domain.Shop.builder()
                 .id(id)
                 .locationUrl(url)
@@ -34,7 +34,7 @@ public abstract class TestData {
                 .suspension(Suspension.active)
                 .categoryId(1)
                 .contractId("1")
-                .detailsName("name")
+                .detailsName(detailsName)
                 .build();
     }
 

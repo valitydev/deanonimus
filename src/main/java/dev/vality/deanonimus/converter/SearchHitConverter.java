@@ -26,5 +26,4 @@ public class SearchHitConverter {
     private SearchHit convertSearchHit(Hit<Party> partySearchHit) {
         return new SearchHit(partySearchHit.score(), partyConverter.convert(partySearchHit.source()));
     }
-
 }

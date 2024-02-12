@@ -24,10 +24,11 @@ public class ContractorConverter {
     }
 
     private Map.Entry<String, PartyContractor> convertToEntity(Contractor contractor) {
-        return Map.entry(contractor.getId(), new PartyContractor(
+        return Map.entry(
                 contractor.getId(),
-                convertContractor(contractor)
-        ));
+                new PartyContractor(
+                        contractor.getId(),
+                        convertContractor(contractor)));
     }
 
     private dev.vality.damsel.deanonimus.Contractor convertContractor(Contractor contractor) {
@@ -47,7 +48,7 @@ public class ContractorConverter {
 
     @NotNull
     private LegalEntity buildInternationalLegalEntity(Contractor contractor) {
-        InternationalLegalEntity internationalLegalEntity = new InternationalLegalEntity()
+        var internationalLegalEntity = new InternationalLegalEntity()
                 .setLegalName(contractor.getInternationalLegalEntityLegalName())
                 .setTradingName(contractor.getInternationalLegalEntityTradingName())
                 .setRegisteredAddress(contractor.getInternationalLegalEntityRegisteredAddress())
@@ -58,7 +59,7 @@ public class ContractorConverter {
 
     @NotNull
     private LegalEntity buildRussianLegalEntity(Contractor contractor) {
-        RussianLegalEntity russianLegalEntity = new RussianLegalEntity()
+        var russianLegalEntity = new RussianLegalEntity()
                 .setRegisteredName(contractor.getRussianLegalEntityRegisteredName())
                 .setRegisteredNumber(contractor.getRussianLegalEntityRegisteredNumber())
                 .setInn(contractor.getRussianLegalEntityInn())
@@ -68,8 +69,7 @@ public class ContractorConverter {
                         contractor.getRussianLegalEntityRussianBankAccount(),
                         contractor.getRussianLegalEntityRussianBankName(),
                         contractor.getRussianLegalEntityRussianBankPostAccount(),
-                        contractor.getRussianLegalEntityRussianBankBik()
-                ));
+                        contractor.getRussianLegalEntityRussianBankBik()));
         return LegalEntity.russian_legal_entity(russianLegalEntity);
     }
 }

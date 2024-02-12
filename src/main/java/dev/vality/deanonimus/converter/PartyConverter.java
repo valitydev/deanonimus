@@ -13,17 +13,19 @@ public class PartyConverter implements Converter<dev.vality.deanonimus.domain.Pa
     private final ContractorConverter contractorConverter;
     private final ContractConverter contractConverter;
     private final ShopListConverter shopConverter;
+    private final WalletListConverter walletListConverter;
 
     @Override
     public Party convert(dev.vality.deanonimus.domain.Party domainParty) {
-        return new Party(
+        var party = new Party(
                 domainParty.getId(),
                 domainParty.getEmail(),
                 EnumUtils.convertBlocking(domainParty.getBlocking()),
                 EnumUtils.convertSuspension(domainParty.getSuspension()),
                 contractorConverter.convert(domainParty.getContractors()),
                 contractConverter.convert(domainParty.getContracts()),
-                shopConverter.convert(domainParty.getShops())
-        );
+                shopConverter.convert(domainParty.getShops()));
+        party.setWallets(walletListConverter.convert(domainParty.getWallets()));
+        return party;
     }
 }

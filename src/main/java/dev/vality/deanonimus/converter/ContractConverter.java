@@ -25,17 +25,14 @@ public class ContractConverter {
     }
 
     private Contract convertContract(dev.vality.deanonimus.domain.Contract contractDomain) {
-        Contract contract = new Contract(
+        var contract = new Contract(
                 contractDomain.getId(),
                 convertStatus(contractDomain.getStatus()),
-                contractDomain.getTermsId()
-        );
+                contractDomain.getTermsId());
         contract.setContractorId(contractDomain.getContractorId());
-
         if (contractDomain.getLegalAgreementId() != null) {
             contract.setLegalAgreement(new LegalAgreement(
-                    contractDomain.getLegalAgreementId()
-            ));
+                    contractDomain.getLegalAgreementId()));
         }
         if (contractDomain.getPaymentInstitutionId() != null) {
             contract.setPaymentInstitutionId(contractDomain.getPaymentInstitutionId());
@@ -54,8 +51,6 @@ public class ContractConverter {
             case active -> ContractStatus.active(new ContractActive());
             case expired -> ContractStatus.expired(new ContractExpired());
             case terminated -> ContractStatus.terminated(new ContractTerminated());
-            default -> throw new IllegalArgumentException("No such contractStatus: " + status);
         };
     }
-
 }

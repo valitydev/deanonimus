@@ -22,13 +22,17 @@ public class SearchDaoImpl implements SearchDao {
 
     private final OpenSearchClient openSearchClient;
 
-    @SneakyThrows
     @Override
     public SearchResponse<Party> searchParty(String text) {
         var queryBuilder = new BoolQuery.Builder()
                 .should(searchBestFields(text, keywords()),
                         searchPhrasePrefix(text, fields()))
                 .build();
+        return search(queryBuilder);
+    }
+
+    @SneakyThrows
+    private SearchResponse<Party> search(BoolQuery queryBuilder) {
         return openSearchClient.search(
                 s -> s
                         .size(responseLimit)
@@ -41,26 +45,26 @@ public class SearchDaoImpl implements SearchDao {
     private List<String> keywords() {
         return List.of(
                 "id.keyword",
+                "shops.id.keyword",
+                "wallets.id.keyword",
                 "contractors.id.keyword",
                 "contractors.russianLegalEntityInn.keyword",
                 "contractors.russianLegalEntityRussianBankAccount.keyword",
-                "contracts.id.keyword",
-                "shops.id.keyword",
-                "wallets.id.keyword");
+                "contracts.id.keyword");
     }
 
     private List<String> fields() {
         return List.of(
                 "email",
+                "shops.locationUrl",
+                "shops.detailsName",
+                "wallets.name",
                 "contractors.registeredUserEmail",
                 "contractors.russianLegalEntityRegisteredName",
                 "contractors.internationalLegalEntityLegalName",
                 "contractors.internationalLegalEntityTradingName",
                 "contracts.legalAgreementId",
-                "contracts.reportActSignerFullName",
-                "shops.locationUrl",
-                "shops.detailsName",
-                "wallets.name");
+                "contracts.reportActSignerFullName");
     }
 
     private Query searchBestFields(String text, List<String> fields) {

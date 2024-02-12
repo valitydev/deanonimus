@@ -22,9 +22,10 @@ public class WalletListConverter {
     }
 
     private Map.Entry<String, Wallet> convertToEntity(dev.vality.deanonimus.domain.Wallet walletDomain) {
-        return Map.entry(walletDomain.getId(), new Wallet(
+        return Map.entry(
                 walletDomain.getId(),
-                walletDomain.getName()
-        ));
+                new Wallet(
+                        walletDomain.getId(),
+                        walletDomain.getName()));
     }
 }
