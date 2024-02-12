@@ -32,9 +32,11 @@ public class DeanonimusServiceHandler implements DeanonimusSrv.Iface {
         log.info("Incoming request for party with text: {}", text);
         var searchHits = searchDao.searchParty(text);
         var parties = searchHits.hits().hits().stream().map(Hit::source).collect(toList());
-        log.info("Found for party search parties: {}", parties);
+        log.debug("Found for party search parties: {}", parties);
+        log.info("Found for party search parties: {}", parties.size());
         var foundSearchHits = searchHitConverter.convert(searchHits);
-        log.info("Found party: {}", foundSearchHits);
+        log.debug("Found party: {}", foundSearchHits);
+        log.info("Found party: {}", foundSearchHits.size());
         return foundSearchHits;
     }
 
@@ -43,9 +45,11 @@ public class DeanonimusServiceHandler implements DeanonimusSrv.Iface {
         log.info("Incoming request for shop with text: {}", text);
         var searchHits = searchDao.searchParty(text);
         var parties = searchHits.hits().hits().stream().map(Hit::source).collect(toList());
-        log.info("Found for shop search parties: {}", parties);
+        log.debug("Found for shop search parties: {}", parties);
+        log.info("Found for shop search parties: {}", parties.size());
         var foundSearchHits = searchHitShopConverter.convert(searchHits, text);
-        log.info("Found shop: {}", foundSearchHits);
+        log.debug("Found shop: {}", foundSearchHits);
+        log.info("Found shop: {}", foundSearchHits.size());
         return foundSearchHits;
     }
 
@@ -54,9 +58,11 @@ public class DeanonimusServiceHandler implements DeanonimusSrv.Iface {
         log.info("Incoming request for wallets with text: {}", text);
         var searchHits = searchDao.searchParty(text);
         var parties = searchHits.hits().hits().stream().map(Hit::source).collect(toList());
-        log.info("Found for wallet search parties: {}", parties);
+        log.debug("Found for wallet search parties: {}", parties);
+        log.info("Found for wallet search parties: {}", parties.size());
         var foundSearchHits = searchHitWalletConverter.convert(searchHits, text);
-        log.info("Found wallet: {}", foundSearchHits);
+        log.debug("Found wallet: {}", foundSearchHits);
+        log.info("Found wallet: {}", foundSearchHits.size());
         return foundSearchHits;
     }
 }
