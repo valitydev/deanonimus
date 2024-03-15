@@ -64,10 +64,8 @@ public class ReadTest extends AbstractIntegrationTest {
         var indices = client.indices();
         if (indices.exists(new ExistsRequest.Builder().index(PARTY_INDEX).build()).value()) {
             indices.delete(new DeleteIndexRequest.Builder().index(PARTY_INDEX).build());
-            createIndex();
-        } else {
-            createIndex();
         }
+        createIndex();
     }
 
     @Test
