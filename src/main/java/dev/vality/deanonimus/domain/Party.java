@@ -24,7 +24,7 @@ import java.util.Optional;
 @Setting(settingPath = "/settings/autocomplete-analyzer.json")
 public class Party {
     @Id
-    @Field(type = FieldType.Keyword)
+    @Field(type = FieldType.Text, analyzer = "autocomplete", searchAnalyzer = "standard")
     private String id;
     @Field(type = FieldType.Text, analyzer = "autocomplete", searchAnalyzer = "standard")
     private String email;

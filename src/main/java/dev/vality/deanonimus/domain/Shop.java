@@ -14,7 +14,7 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Shop {
-    @Field(type = FieldType.Keyword)
+    @Field(type = FieldType.Text, analyzer = "autocomplete", searchAnalyzer = "standard")
     private String id;
     private Blocking blocking;
     private Suspension suspension;

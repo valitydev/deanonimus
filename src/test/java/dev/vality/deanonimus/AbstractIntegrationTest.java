@@ -23,7 +23,7 @@ import java.util.Map;
 @Slf4j
 @ExtendWith({KafkaContainerExtension.class, OpensearchContainerExtension.class})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public abstract class AbstractIntegrationTest {
 
     private static final String TOPIC_NAME = "mg-events-party";

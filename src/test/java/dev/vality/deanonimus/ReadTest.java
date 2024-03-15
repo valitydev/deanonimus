@@ -4,6 +4,7 @@ import dev.vality.damsel.deanonimus.SearchHit;
 import dev.vality.damsel.deanonimus.SearchShopHit;
 import dev.vality.damsel.deanonimus.SearchWalletHit;
 import dev.vality.deanonimus.domain.Party;
+import dev.vality.deanonimus.extension.OpensearchContainerExtension;
 import dev.vality.deanonimus.handler.DeanonimusServiceHandler;
 import dev.vality.deanonimus.service.OpenSearchService;
 import lombok.SneakyThrows;
@@ -15,9 +16,12 @@ import org.opensearch.client.opensearch.indices.DeleteIndexRequest;
 import org.opensearch.client.opensearch.indices.ExistsRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.core.io.Resource;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import static dev.vality.deanonimus.constant.OpenSearchConstants.PARTY_INDEX;
@@ -28,6 +32,9 @@ public class ReadTest extends AbstractIntegrationTest {
     @Value("${data.response.limit}")
     Integer responseLimit;
 
+    @Value("classpath:index_request.json")
+    Resource indexModel;
+
     @Autowired
     OpenSearchService openSearchService;
 
@@ -36,6 +43,10 @@ public class ReadTest extends AbstractIntegrationTest {
 
     @Autowired
     DeanonimusServiceHandler deanonimusServiceHandler;
+
+    @Autowired
+    TestRestTemplate restTemplate;
+
 
     private static final String PARTY = "party";
     private static final String SHOP = "shop";
@@ -53,6 +64,9 @@ public class ReadTest extends AbstractIntegrationTest {
         var indices = client.indices();
         if (indices.exists(new ExistsRequest.Builder().index(PARTY_INDEX).build()).value()) {
             indices.delete(new DeleteIndexRequest.Builder().index(PARTY_INDEX).build());
+            createIndex();
+        } else {
+            createIndex();
         }
     }
 
@@ -168,6 +182,108 @@ public class ReadTest extends AbstractIntegrationTest {
     }
 
     @Test
+    void searchShopTextByShopNames() {
+        var party1 = givenParty(PARTY + "id-1", EMAIL);
+        givenShop(party1, SHOP + "id-1", URL, "S2P_BRL");
+
+        var party2 = givenParty(PARTY + "id-2", EMAIL);
+        givenShop(party2, SHOP + "id-2", URL, "S2P_BRL");
+
+        refreshIndices();
+        var searchHits = deanonimusServiceHandler.searchShopText("s2p");
+
+        assertFalse(searchHits.isEmpty());
+        assertEquals(2, searchHits.size());
+        var expected = Set.of(SHOP + "id-1", SHOP + "id-2");
+        assertTrue(searchHits.stream().allMatch(shopHit -> expected.contains(shopHit.getShop().getId())));
+    }
+
+    @Test
+    void searchShopTextByPartyId() {
+        var party = givenParty(PARTY, EMAIL);
+        givenShop(party, SHOP, URL, "S2P_BRL");
+        refreshIndices();
+        var searchHits = deanonimusServiceHandler.searchShopText(PARTY);
+
+        assertFalse(searchHits.isEmpty());
+        assertEquals(1, searchHits.size());
+        assertTrue(searchHits.stream().anyMatch(shopHit -> shopHit.getParty().getId().equals(PARTY)));
+    }
+
+    @Test
+    void searchShopTextContainsPartyId() {
+        var party = givenParty("party-test-1", EMAIL);
+        givenShop(party, SHOP, URL, "S2P_BRL");
+        refreshIndices();
+        var searchHits = deanonimusServiceHandler.searchShopText("test");
+
+        assertFalse(searchHits.isEmpty());
+        assertEquals(1, searchHits.size());
+        assertTrue(searchHits.stream().anyMatch(shopHit -> shopHit.getParty().getId().equals("party-test-1")));
+    }
+
+    @Test
+    void searchShopTextByContractorId() {
+        var party = givenParty(PARTY, EMAIL);
+        givenShop(party, SHOP, URL, "S2P_BRL");
+        givenRegisteredUserContractor(party, CONTRACTOR, EMAIL);
+
+        refreshIndices();
+        var searchHits = deanonimusServiceHandler.searchShopText(CONTRACTOR);
+
+        assertFalse(searchHits.isEmpty());
+        assertEquals(1, searchHits.size());
+        assertTrue(searchHits.stream().anyMatch(shopHit -> shopHit.getShop().getId().equals(SHOP)));
+    }
+
+    @Test
+    void searchShopTextByContractId() {
+        var party = givenParty(PARTY, EMAIL);
+        givenShop(party, SHOP, URL, "S2P_BRL");
+        givenContract(party, CONTRACT, 123, "ДГ-123432", "Василий Пупкин");
+        refreshIndices();
+        var searchHits = deanonimusServiceHandler.searchShopText(PARTY);
+
+        assertFalse(searchHits.isEmpty());
+        assertEquals(1, searchHits.size());
+        assertTrue(searchHits.stream().anyMatch(shopHit -> shopHit.getShop().getId().equals(SHOP)));
+    }
+
+    @Test
+    void searchShopTextByEmail() {
+        var party = givenParty(PARTY, EMAIL);
+        givenShop(party, SHOP, URL, "S2P_BRL");
+        refreshIndices();
+        var searchHits = deanonimusServiceHandler.searchShopText(EMAIL);
+
+        assertFalse(searchHits.isEmpty());
+        assertEquals(1, searchHits.size());
+        assertTrue(searchHits.stream().anyMatch(shopHit -> shopHit.getShop().getId().equals(SHOP)));
+    }
+
+    @Test
+    void searchShopTextByPartyIdAndShopId() {
+
+        var party1 = givenParty("party-test-1", EMAIL);
+        givenShop(party1, "shop-id-1", URL, "S2P_BRL-1");
+        givenShop(party1, "shop-id-2", URL, "S2P_BRL-2");
+
+        var party2 = givenParty("party-id-2", EMAIL);
+        givenShop(party2, "shop-test-1", URL, "details-1");
+        givenShop(party2, "shop-none-2", URL, "details-2");
+
+
+        refreshIndices();
+        var searchHits = deanonimusServiceHandler.searchShopText("test");
+
+        assertFalse(searchHits.isEmpty());
+        assertEquals(3, searchHits.size());
+
+        var expected = Set.of("shop-id-1", "shop-id-2", "shop-test-1");
+        assertTrue(searchHits.stream().allMatch(shopHit -> expected.contains(shopHit.getShop().getId())));
+    }
+
+    @Test
     void searchShopTextByDiffShop() throws TException {
         Party party = givenParty(PARTY, EMAIL);
         givenShop(party, SHOP + "kek", URL + "testkek");
@@ -193,6 +309,25 @@ public class ReadTest extends AbstractIntegrationTest {
         assertFalse(searchShopHits.isEmpty());
         assertTrue(searchShopHits.stream()
                 .anyMatch(partySearchHit -> partySearchHit.getShop().getId().equals(SHOP)));
+    }
+
+    @Test
+    void searchShopTextContainsShopIds() {
+        Party party1 = givenParty(PARTY + "id-1", EMAIL);
+        givenShop(party1, "test-id-1", URL);
+
+        Party party2 = givenParty(PARTY + "id-2", EMAIL);
+        givenShop(party2, "test-id-2", URL);
+
+        refreshIndices();
+
+        List<SearchShopHit> searchShopHits = deanonimusServiceHandler.searchShopText("test");
+
+        assertFalse(searchShopHits.isEmpty());
+        assertEquals(2, searchShopHits.size());
+
+        var expected = Set.of("test-id-1", "test-id-2");
+        assertTrue(searchShopHits.stream().allMatch(shopHit -> expected.contains(shopHit.getShop().getId())));
     }
 
     @Test
@@ -470,5 +605,13 @@ public class ReadTest extends AbstractIntegrationTest {
     @SneakyThrows
     private void refreshIndices() {
         client.indices().refresh();
+    }
+
+    private void createIndex() {
+        var url = "http://" +
+                OpensearchContainerExtension.OPENSEARCH.getHost() + ":" +
+                OpensearchContainerExtension.OPENSEARCH.getFirstMappedPort() + "/" +
+                PARTY_INDEX;
+        restTemplate.put(url, indexModel);
     }
 }
