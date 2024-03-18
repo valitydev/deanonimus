@@ -7,7 +7,8 @@ import dev.vality.damsel.deanonimus.SearchWalletHit;
 import dev.vality.deanonimus.converter.SearchHitConverter;
 import dev.vality.deanonimus.converter.SearchHitShopConverter;
 import dev.vality.deanonimus.converter.SearchHitWalletConverter;
-import dev.vality.deanonimus.db.SearchDao;
+import dev.vality.deanonimus.db.SearchByShopDao;
+import dev.vality.deanonimus.db.SearchDaoImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.opensearch.client.opensearch.core.search.Hit;
@@ -25,7 +26,8 @@ public class DeanonimusServiceHandler implements DeanonimusSrv.Iface {
     private final SearchHitConverter searchHitConverter;
     private final SearchHitShopConverter searchHitShopConverter;
     private final SearchHitWalletConverter searchHitWalletConverter;
-    private final SearchDao searchDao;
+    private final SearchDaoImpl searchDao;
+    private final SearchByShopDao searchByShopDao;
 
     @Override
     public List<SearchHit> searchParty(String text) {
@@ -43,7 +45,7 @@ public class DeanonimusServiceHandler implements DeanonimusSrv.Iface {
     @Override
     public List<SearchShopHit> searchShopText(String text) {
         log.info("Incoming request for shop with text: {}", text);
-        var searchHits = searchDao.searchParty(text);
+        var searchHits = searchByShopDao.searchParty(text);
         var parties = searchHits.hits().hits().stream().map(Hit::source).collect(toList());
         log.debug("Found for shop search parties: {}", parties);
         log.info("Found for shop search parties: {}", parties.size());
