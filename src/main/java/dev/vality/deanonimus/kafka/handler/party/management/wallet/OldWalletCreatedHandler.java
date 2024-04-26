@@ -19,7 +19,7 @@ import java.util.List;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class WalletCreatedHandler extends AbstractClaimChangedHandler {
+public class OldWalletCreatedHandler extends AbstractClaimChangedHandler {
 
     private final OpenSearchService openSearchService;
 
@@ -29,7 +29,7 @@ public class WalletCreatedHandler extends AbstractClaimChangedHandler {
         List<ClaimEffect> claimEffects = getClaimStatus(change).getAccepted().getEffects();
         for (ClaimEffect claimEffect : claimEffects) {
             if (claimEffect.isSetWalletEffect() && claimEffect.getWalletEffect().getEffect().isSetCreated()) {
-                handleEvent(event, changeId, claimEffect);
+//                handleEvent(event, changeId, claimEffect);
             }
         }
     }

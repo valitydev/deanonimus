@@ -57,6 +57,11 @@
             <artifactId>deanonimus-proto</artifactId>
             <version>1.40-2a02d87</version>
         </dependency>
+        <dependency>
+            <groupId>dev.vality</groupId>
+            <artifactId>fistful-proto</artifactId>
+            <version>1.166-be67e59</version>
+        </dependency>
         <!--spring-->
         <dependency>
             <groupId>org.springframework.boot</groupId>

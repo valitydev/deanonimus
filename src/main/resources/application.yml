@@ -65,3 +65,15 @@ kafka:
       id: mg-events-party
       enabled: false
       consumer.group-id: "DeanonimusListenerPartyManagement"
+    wallet:
+      id: mg-events-ff-wallet
+      enabled: false
+      consumer:
+        group-id: "DeanonimusListenerWallet"
+        concurrency: 7
+    identity:
+      id: mg-events-ff-identity
+      enabled: false
+      consumer:
+        group-id: "DeanonimusListenerIdentity"
+        concurrency: 7

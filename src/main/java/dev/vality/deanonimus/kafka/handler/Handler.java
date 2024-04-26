@@ -1,4 +1,4 @@
-package dev.vality.deanonimus.kafka.handler.party.management;
+package dev.vality.deanonimus.kafka.handler;
 
 
 import dev.vality.geck.filter.Filter;
