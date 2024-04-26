@@ -35,7 +35,7 @@ public class KafkaConfig {
     private int partyConcurrency;
     @Value("${kafka.topics.wallet.consumer.concurrency}")
     private int walletConcurrency;
-    @Value("${kafka.topics.wallet.consumer.concurrency}")
+    @Value("${kafka.topics.identity.consumer.concurrency}")
     private int identityConcurrency;
 
     @Bean

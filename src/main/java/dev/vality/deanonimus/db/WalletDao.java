@@ -50,8 +50,7 @@ public class WalletDao {
     }
 
     private List<String> fields() {
-        return List.of(
-                "name");
+        return List.of("name");
     }
 
     private Query searchBestFields(String text, List<String> fields) {
