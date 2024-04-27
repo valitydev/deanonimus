@@ -2,10 +2,12 @@ package dev.vality.deanonimus;
 
 import dev.vality.damsel.domain.*;
 import dev.vality.damsel.payment_processing.*;
+import dev.vality.fistful.base.CurrencyRef;
 import dev.vality.geck.common.util.TypeUtil;
 import dev.vality.geck.serializer.kit.mock.MockMode;
 import dev.vality.geck.serializer.kit.mock.MockTBaseProcessor;
 import dev.vality.geck.serializer.kit.tbase.TBaseHandler;
+import dev.vality.kafka.common.serialization.ThriftSerializer;
 import dev.vality.machinegun.eventsink.MachineEvent;
 import dev.vality.machinegun.eventsink.SinkEvent;
 import dev.vality.machinegun.msgpack.Value;
@@ -16,10 +18,7 @@ import lombok.NoArgsConstructor;
 import java.io.IOException;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class PartyFlowGenerator {
@@ -48,17 +47,24 @@ public class PartyFlowGenerator {
         return sinkEvents;
     }
 
-    public static List<SinkEvent> generateWalletFlow(String partyId) throws IOException {
+    public static List<SinkEvent> generateWalletFlow(String walletId, String identityId) throws IOException {
         List<SinkEvent> sinkEvents = new ArrayList<>();
         long sequenceId = 0L;
-        sinkEvents.add(buildSinkEvent(buildMessagePartyCreated(sequenceId++, partyId)));
-        sinkEvents.add(buildSinkEvent(buildMessageWalletCreated(sequenceId, partyId, WALLET_ID)));
+        sinkEvents.add(buildSinkEvent(buildMessageWalletCreated(sequenceId++, walletId)));
+        sinkEvents.add(buildSinkEvent(buildMessageWalletAccountCreated(sequenceId, walletId, identityId)));
+        return sinkEvents;
+    }
+
+    public static List<SinkEvent> generateIdentityFlow(String identityId, String partyId) throws IOException {
+        List<SinkEvent> sinkEvents = new ArrayList<>();
+        long sequenceId = 0L;
+        sinkEvents.add(buildSinkEvent(buildMessageIdentityCreated(sequenceId, identityId, partyId)));
         return sinkEvents;
     }
 
     public static MachineEvent buildMessagePartyCreated(Long sequenceId, String partyId) {
         PartyChange partyChange = buildPartyCreatedPartyChange(partyId);
-        return buildMachineEvent(partyId, sequenceId, partyChange);
+        return buildPartyChangeMachineEvent(partyId, sequenceId, partyChange);
     }
 
     public static PartyChange buildPartyCreatedPartyChange(String partyId) {
@@ -70,7 +76,22 @@ public class PartyFlowGenerator {
 
     public static MachineEvent buildMessagePartyBlocking(Long sequenceId, String partyId) {
         PartyChange partyChange = buildPartyBlockingPartyChange();
-        return buildMachineEvent(partyId, sequenceId, partyChange);
+        return buildPartyChangeMachineEvent(partyId, sequenceId, partyChange);
+    }
+
+    public static MachineEvent buildMessageWalletCreated(Long sequenceId, String walletId) {
+        var change = buildWalletCreatedChange();
+        return buildWalletChangeMachineEvent(walletId, sequenceId, change);
+    }
+
+    public static MachineEvent buildMessageWalletAccountCreated(Long sequenceId, String walletId, String identityId) {
+        var change = buildWalletAccountChange(identityId);
+        return buildWalletChangeMachineEvent(walletId, sequenceId, change);
+    }
+
+    public static MachineEvent buildMessageIdentityCreated(Long sequenceId, String identityId, String partyId) {
+        var change = buildIdentityCreatedChange(partyId);
+        return buildIdentityChangeMachineEvent(identityId, sequenceId, change);
     }
 
     public static PartyChange buildPartyBlockingPartyChange() {
@@ -82,7 +103,7 @@ public class PartyFlowGenerator {
 
     public static MachineEvent buildMessagePartySuspension(Long sequenceId, String partyId) {
         PartyChange partyChange = buildPartySuspensionPartyChange();
-        return buildMachineEvent(partyId, sequenceId, partyChange);
+        return buildPartyChangeMachineEvent(partyId, sequenceId, partyChange);
     }
 
     public static PartyChange buildPartySuspensionPartyChange() {
@@ -92,9 +113,51 @@ public class PartyFlowGenerator {
         return partyChange;
     }
 
+    public static dev.vality.fistful.wallet.TimestampedChange buildWalletCreatedChange() {
+        var value = new dev.vality.fistful.wallet.Wallet();
+        value.setName("asd");
+        value.setExternalId(UUID.randomUUID().toString());
+        var change = new dev.vality.fistful.wallet.Change();
+        change.setCreated(value);
+        var timestampedChange = new dev.vality.fistful.wallet.TimestampedChange();
+        timestampedChange.setOccuredAt("2023-07-03T10:15:30Z");
+        timestampedChange.setChange(change);
+        return timestampedChange;
+    }
+
+    public static dev.vality.fistful.wallet.TimestampedChange buildWalletAccountChange(String identityId) {
+        var value = new dev.vality.fistful.account.Account();
+        value.setAccounterAccountId(0);
+        value.setCurrency(new CurrencyRef("rub"));
+        value.setId(UUID.randomUUID().toString());
+        value.setIdentity(identityId);
+        var accountChange = new dev.vality.fistful.wallet.AccountChange();
+        accountChange.setCreated(value);
+        var change = new dev.vality.fistful.wallet.Change();
+        change.setAccount(accountChange);
+        var timestampedChange = new dev.vality.fistful.wallet.TimestampedChange();
+        timestampedChange.setOccuredAt("2023-07-03T10:15:30Z");
+        timestampedChange.setChange(change);
+        return timestampedChange;
+    }
+
+    public static dev.vality.fistful.identity.TimestampedChange buildIdentityCreatedChange(String partyId) {
+        var value = new dev.vality.fistful.identity.Identity();
+        value.setName("asd");
+        value.setId(UUID.randomUUID().toString());
+        value.setProvider(UUID.randomUUID().toString());
+        value.setParty(partyId);
+        var change = new dev.vality.fistful.identity.Change();
+        change.setCreated(value);
+        var timestampedChange = new dev.vality.fistful.identity.TimestampedChange();
+        timestampedChange.setOccuredAt("2023-07-03T10:15:30Z");
+        timestampedChange.setChange(change);
+        return timestampedChange;
+    }
+
     public static MachineEvent buildMessagePartyRevisionChanged(Long sequenceId, String partyId) {
         PartyChange partyChange = buildPartyRevisionChangedPartyChange();
-        return buildMachineEvent(partyId, sequenceId, partyChange);
+        return buildPartyChangeMachineEvent(partyId, sequenceId, partyChange);
     }
 
     public static PartyChange buildPartyRevisionChangedPartyChange() {
@@ -104,32 +167,12 @@ public class PartyFlowGenerator {
         return partyChange;
     }
 
-    public static MachineEvent buildMessageWalletCreated(Long sequenceId, String partyId, String walletId)
-            throws IOException {
-        PartyChange partyChange = buildWalletCreatedPartyChange(walletId);
-        return buildMachineEvent(partyId, sequenceId, partyChange);
-    }
-
-    public static PartyChange buildWalletCreatedPartyChange(String walletd) throws IOException {
-        WalletEffectUnit walletEffectUnit = new WalletEffectUnit();
-        walletEffectUnit.setId(walletd);
-        WalletEffect shopEffect = new WalletEffect();
-        shopEffect.setCreated(buildWalletCreated());
-        walletEffectUnit.setEffect(shopEffect);
-        ClaimEffect claimEffect = new ClaimEffect();
-        claimEffect.setWalletEffect(walletEffectUnit);
-        Claim claim = buildClaimCreated(claimEffect);
-        PartyChange partyChange = new PartyChange();
-        partyChange.setClaimCreated(claim);
-        return partyChange;
-    }
-
     public static MachineEvent buildContractorCreated(
             Long sequenceId,
             PartyContractor partyContractor,
             String partyId) {
         PartyChange partyChange = buildContractorCreatedPartyChange(partyContractor);
-        return buildMachineEvent(partyId, sequenceId, partyChange);
+        return buildPartyChangeMachineEvent(partyId, sequenceId, partyChange);
     }
 
     public static PartyChange buildContractorCreatedPartyChange(PartyContractor partyContractor) {
@@ -148,7 +191,7 @@ public class PartyFlowGenerator {
 
     public static MachineEvent buildContractorIdentificationLevelChanged(Long sequenceId, String partyId) {
         PartyChange partyChange = buildContractorIdentificationLevelChangedPartyChange();
-        return buildMachineEvent(partyId, sequenceId, partyChange);
+        return buildPartyChangeMachineEvent(partyId, sequenceId, partyChange);
     }
 
     public static PartyChange buildContractorIdentificationLevelChangedPartyChange() {
@@ -190,14 +233,6 @@ public class PartyFlowGenerator {
                 TypeUtil.temporalToString(LocalDateTime.now()));
     }
 
-    public static Wallet buildWalletCreated() throws IOException {
-        Wallet wallet = new Wallet();
-        wallet = new MockTBaseProcessor(MockMode.ALL).process(wallet, new TBaseHandler<>(Wallet.class));
-        wallet.setCreatedAt(TypeUtil.temporalToString(LocalDateTime.now()));
-        wallet.setSuspension(buildPartySuspension());
-        return wallet;
-    }
-
     public static PartyRevisionChanged buildPartyRevisionChanged() {
         return new PartyRevisionChanged(TypeUtil.temporalToString(LocalDateTime.now()), PARTY_REVISION_ID);
     }
@@ -220,7 +255,8 @@ public class PartyFlowGenerator {
         return blocking;
     }
 
-    public static MachineEvent buildMachineEvent(String sourceId, Long sequenceId, PartyChange... partyChange) {
+    public static MachineEvent buildPartyChangeMachineEvent(String sourceId, Long sequenceId,
+                                                            PartyChange... partyChange) {
         MachineEvent message = new MachineEvent();
         message.setCreatedAt(TypeUtil.temporalToString(Instant.now()));
         message.setEventId(sequenceId);
@@ -231,6 +267,28 @@ public class PartyFlowGenerator {
         ArrayList<PartyChange> partyChanges = new ArrayList<>(Arrays.asList(partyChange));
         data.setBin(partyEventDataSerializer.serialize(new PartyEventData(partyChanges)));
         message.setData(data);
+        return message;
+    }
+
+    public static MachineEvent buildWalletChangeMachineEvent(String sourceId, Long sequenceId,
+                                                             dev.vality.fistful.wallet.TimestampedChange change) {
+        var message = new MachineEvent();
+        message.setCreatedAt(TypeUtil.temporalToString(Instant.now()));
+        message.setEventId(sequenceId);
+        message.setSourceNs(SOURCE_NS);
+        message.setSourceId(sourceId);
+        message.setData(dev.vality.machinegun.msgpack.Value.bin(new ThriftSerializer<>().serialize("", change)));
+        return message;
+    }
+
+    public static MachineEvent buildIdentityChangeMachineEvent(String sourceId, Long sequenceId,
+                                                               dev.vality.fistful.identity.TimestampedChange change) {
+        var message = new MachineEvent();
+        message.setCreatedAt(TypeUtil.temporalToString(Instant.now()));
+        message.setEventId(sequenceId);
+        message.setSourceNs(SOURCE_NS);
+        message.setSourceId(sourceId);
+        message.setData(dev.vality.machinegun.msgpack.Value.bin(new ThriftSerializer<>().serialize("", change)));
         return message;
     }
 

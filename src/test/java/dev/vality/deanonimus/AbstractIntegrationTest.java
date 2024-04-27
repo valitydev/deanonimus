@@ -16,6 +16,7 @@ import org.springframework.kafka.test.utils.KafkaTestUtils;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.TestPropertySource;
 
 import java.util.List;
 import java.util.Map;
@@ -24,9 +25,12 @@ import java.util.Map;
 @ExtendWith({KafkaContainerExtension.class, OpensearchContainerExtension.class})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@TestPropertySource(properties = {"kafka.topics.wallet.enabled=true", "kafka.topics.identity.enabled=true"})
 public abstract class AbstractIntegrationTest {
 
-    private static final String TOPIC_NAME = "mg-events-party";
+    public static final String TOPIC_PARTY = "mg-events-party";
+    public static final String TOPIC_WALLET = "mg-events-ff-wallet";
+    public static final String TOPIC_IDENTITY = "mg-events-ff-identity";
 
     @DynamicPropertySource
     static void containersProps(DynamicPropertyRegistry registry) {
@@ -35,10 +39,14 @@ public abstract class AbstractIntegrationTest {
         registry.add("opensearch.port", () -> OpensearchContainerExtension.OPENSEARCH.getFirstMappedPort());
     }
 
-    public static void sendMessages(List<SinkEvent> sinkEvents) {
-        final Producer<String, SinkEvent> producer = createProducer();
+    public static void sendPartyMessages(List<SinkEvent> sinkEvents) {
+        sendMessages(TOPIC_PARTY, sinkEvents);
+    }
+
+    public static void sendMessages(String topic, List<SinkEvent> sinkEvents) {
+        var producer = createProducer();
         sinkEvents.forEach(sinkEvent ->
-                producer.send(new ProducerRecord<>(TOPIC_NAME, sinkEvent.getEvent().getSourceId(), sinkEvent)));
+                producer.send(new ProducerRecord<>(topic, sinkEvent.getEvent().getSourceId(), sinkEvent)));
     }
 
     private static Producer<String, SinkEvent> createProducer() {
