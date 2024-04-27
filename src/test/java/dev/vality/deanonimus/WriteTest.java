@@ -21,7 +21,7 @@ public class WriteTest extends AbstractIntegrationTest {
     @Test
     void onPartyCreatedElasticHaveIt() throws IOException {
 
-        sendMessages(generatePartyContractorFlow(TestData.SOURCE_ID_ONE));
+        sendPartyMessages(generatePartyContractorFlow(TestData.SOURCE_ID_ONE));
         sleep();
         await().until(() -> openSearchService.findPartyById(TestData.SOURCE_ID_ONE),
                 party -> party != null && party.getId().equals(TestData.SOURCE_ID_ONE)
@@ -31,19 +31,19 @@ public class WriteTest extends AbstractIntegrationTest {
 
     @Test
     void onPartyCreatedWalletFlowElasticHaveIt() throws IOException {
-
-        sendMessages(generateWalletFlow(TestData.SOURCE_ID_ONE));
+        var partyId = "partyId";
+        sendMessages(TOPIC_IDENTITY, generateIdentityFlow(TestData.SOURCE_ID_ONE, partyId));
+        sendMessages(TOPIC_WALLET, generateWalletFlow(TestData.SOURCE_ID_ONE, TestData.SOURCE_ID_ONE));
         sleep();
-        await().until(() -> openSearchService.findPartyById(TestData.SOURCE_ID_ONE),
-                party -> party != null && party.getId().equals(TestData.SOURCE_ID_ONE)
-                        && !party.getWallets().isEmpty()
-        );
-
+        await().until(() -> openSearchService.findIdentityById(TestData.SOURCE_ID_ONE),
+                val -> val != null && val.getId().equals(TestData.SOURCE_ID_ONE));
+        await().until(() -> openSearchService.findWalletById(TestData.SOURCE_ID_ONE),
+                val -> val != null && val.getPartyId().equals(partyId));
     }
 
     @Test
     void onPartyBlockingPartyChanges() {
-        sendMessages(
+        sendPartyMessages(
                 List.of(
                         buildSinkEvent(buildMessagePartyCreated(0L, TestData.SOURCE_ID_ONE)),
                         buildSinkEvent(buildMessagePartyBlocking(0L, TestData.SOURCE_ID_ONE))

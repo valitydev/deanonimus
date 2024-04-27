@@ -27,8 +27,16 @@ public class KafkaConfig {
     private final KafkaProperties kafkaProperties;
     @Value("${kafka.topics.party-management.consumer.group-id}")
     private String partyConsumerGroup;
+    @Value("${kafka.topics.wallet.consumer.group-id}")
+    private String walletConsumerGroup;
+    @Value("${kafka.topics.identity.consumer.group-id}")
+    private String identityConsumerGroup;
     @Value("${kafka.consumer.party-management.concurrency}")
     private int partyConcurrency;
+    @Value("${kafka.topics.wallet.consumer.concurrency}")
+    private int walletConcurrency;
+    @Value("${kafka.topics.identity.consumer.concurrency}")
+    private int identityConcurrency;
 
     @Bean
     public Map<String, Object> consumerConfigs() {
@@ -54,6 +62,24 @@ public class KafkaConfig {
         configs.put(ConsumerConfig.GROUP_ID_CONFIG, partyConsumerGroup);
         ConsumerFactory<String, MachineEvent> consumerFactory = new DefaultKafkaConsumerFactory<>(configs);
         return createConcurrentFactory(consumerFactory, partyConcurrency);
+    }
+
+    @Bean
+    public KafkaListenerContainerFactory
+            <ConcurrentMessageListenerContainer<String, MachineEvent>> walletContainerFactory() {
+        var configs = consumerConfigs();
+        configs.put(ConsumerConfig.GROUP_ID_CONFIG, walletConsumerGroup);
+        var consumerFactory = new DefaultKafkaConsumerFactory<String, MachineEvent>(configs);
+        return createConcurrentFactory(consumerFactory, walletConcurrency);
+    }
+
+    @Bean
+    public KafkaListenerContainerFactory
+            <ConcurrentMessageListenerContainer<String, MachineEvent>> identityContainerFactory() {
+        var configs = consumerConfigs();
+        configs.put(ConsumerConfig.GROUP_ID_CONFIG, identityConsumerGroup);
+        var consumerFactory = new DefaultKafkaConsumerFactory<String, MachineEvent>(configs);
+        return createConcurrentFactory(consumerFactory, identityConcurrency);
     }
 
     private KafkaListenerContainerFactory

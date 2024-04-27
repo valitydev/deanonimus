@@ -21,7 +21,22 @@ public class WalletListConverter {
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (a, b) -> a));
     }
 
+    public Map<String, Wallet> convertWallets(List<dev.vality.deanonimus.domain.wallet.Wallet> wallets) {
+        return Optional.ofNullable(wallets).orElse(Collections.emptyList())
+                .stream()
+                .map(this::convertToEntity)
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (a, b) -> a));
+    }
+
     private Map.Entry<String, Wallet> convertToEntity(dev.vality.deanonimus.domain.Wallet walletDomain) {
+        return Map.entry(
+                walletDomain.getId(),
+                new Wallet(
+                        walletDomain.getId(),
+                        walletDomain.getName()));
+    }
+
+    private Map.Entry<String, Wallet> convertToEntity(dev.vality.deanonimus.domain.wallet.Wallet walletDomain) {
         return Map.entry(
                 walletDomain.getId(),
                 new Wallet(

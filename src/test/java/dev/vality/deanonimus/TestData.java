@@ -38,13 +38,6 @@ public abstract class TestData {
                 .build();
     }
 
-    public static dev.vality.deanonimus.domain.Wallet wallet(String id, String name) {
-        return dev.vality.deanonimus.domain.Wallet.builder()
-                .id(id)
-                .name(name)
-                .build();
-    }
-
     public static dev.vality.deanonimus.domain.Contract contract(String id,
                                                                  Integer termsId,
                                                                  String legalAgreementId,
@@ -108,6 +101,15 @@ public abstract class TestData {
                 .email(email)
                 .blocking(dev.vality.deanonimus.domain.Blocking.unblocked)
                 .suspension(Suspension.active)
+                .build();
+    }
+
+    public static dev.vality.deanonimus.domain.wallet.Wallet wallet(String id, String partyId, String name) {
+        return dev.vality.deanonimus.domain.wallet.Wallet.builder()
+                .id(id)
+                .name(name)
+                .externalId("id")
+                .partyId(partyId)
                 .build();
     }
 }
