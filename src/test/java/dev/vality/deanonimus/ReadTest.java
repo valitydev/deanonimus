@@ -4,6 +4,7 @@ import dev.vality.damsel.deanonimus.SearchHit;
 import dev.vality.damsel.deanonimus.SearchShopHit;
 import dev.vality.damsel.deanonimus.SearchWalletHit;
 import dev.vality.deanonimus.domain.Party;
+import dev.vality.deanonimus.domain.wallet.Wallet;
 import dev.vality.deanonimus.extension.OpensearchContainerExtension;
 import dev.vality.deanonimus.handler.DeanonimusServiceHandler;
 import dev.vality.deanonimus.service.OpenSearchService;
@@ -151,19 +152,6 @@ public class ReadTest extends AbstractIntegrationTest {
         assertTrue(searchHits.stream()
                 .anyMatch(partySearchHit -> partySearchHit.getParty().getShops().values().stream()
                         .anyMatch(shop -> shop.getDetails().getName().contains("S2P"))));
-    }
-
-    @Test
-    void searchPartyByWalletName() throws TException {
-        var party = givenParty(PARTY, EMAIL);
-        givenWallet(party, WALLET, "S2P");
-        refreshIndices();
-        var searchHits = deanonimusServiceHandler.searchParty("s2p");
-
-        assertFalse(searchHits.isEmpty());
-        assertTrue(searchHits.stream()
-                .anyMatch(partySearchHit -> partySearchHit.getParty().getWallets().values().stream()
-                        .anyMatch(o -> o.getName().contains("S2P"))));
     }
 
     @Test
@@ -342,20 +330,20 @@ public class ReadTest extends AbstractIntegrationTest {
 
     @Test
     void searchWalletTextByName() throws TException {
-        Party party = givenParty(PARTY, EMAIL);
-        givenWallet(party, WALLET, WALLET_NAME);
+        givenParty(PARTY, EMAIL);
+        givenWallet(WALLET, PARTY, "S2P");
         refreshIndices();
-        List<SearchWalletHit> searchHits = deanonimusServiceHandler.searchWalletText(WALLET_NAME);
+        List<SearchWalletHit> searchHits = deanonimusServiceHandler.searchWalletText("s2p");
 
         assertFalse(searchHits.isEmpty());
         assertTrue(searchHits.stream()
-                .anyMatch(partySearchHit -> partySearchHit.getWallet().getName().contains(WALLET_NAME)));
+                .anyMatch(partySearchHit -> partySearchHit.getWallet().getName().contains("S2P")));
     }
 
     @Test
     void searchWalletTextById() throws TException {
-        Party party = givenParty(PARTY, EMAIL);
-        givenWallet(party, WALLET, WALLET_NAME);
+        givenParty(PARTY, EMAIL);
+        givenWallet(WALLET, PARTY, WALLET_NAME);
         refreshIndices();
         List<SearchWalletHit> searchHits = deanonimusServiceHandler.searchWalletText(WALLET);
 
@@ -564,9 +552,8 @@ public class ReadTest extends AbstractIntegrationTest {
         openSearchService.updateParty(party);
     }
 
-    private void givenWallet(Party party, String id, String name) {
-        party.addWallet(TestData.wallet(id, name));
-        openSearchService.updateParty(party);
+    private Wallet givenWallet(String id, String partyId, String name) {
+        return openSearchService.createWallet(TestData.wallet(id, partyId, name));
     }
 
     private Party givenParty(String id, String email) {
