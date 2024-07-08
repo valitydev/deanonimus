@@ -12,6 +12,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+import static dev.vality.deanonimus.constant.OpenSearchConstants.WALLET_INDEX;
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -35,6 +37,7 @@ public class WalletDao {
         return openSearchClient.search(
                 s -> s
                         .size(responseLimit)
+                        .index(WALLET_INDEX)
                         .query(new Query.Builder()
                                 .bool(queryBuilder)
                                 .build()),
