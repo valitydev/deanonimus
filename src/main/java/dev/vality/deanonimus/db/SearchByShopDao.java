@@ -55,9 +55,7 @@ public class SearchByShopDao implements SearchDao {
 
     private List<String> fields() {
         return List.of(
-                "id",
                 "email",
-                "shops.id",
                 "shops.locationUrl",
                 "shops.detailsName",
                 "shops.contractId",
