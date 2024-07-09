@@ -12,6 +12,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+import static dev.vality.deanonimus.constant.OpenSearchConstants.PARTY_INDEX;
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -36,6 +38,7 @@ public class SearchDaoImpl implements SearchDao {
         return openSearchClient.search(
                 s -> s
                         .size(responseLimit)
+                        .index(PARTY_INDEX)
                         .query(new Query.Builder()
                                 .bool(queryBuilder)
                                 .build()),
@@ -55,7 +58,9 @@ public class SearchDaoImpl implements SearchDao {
 
     private List<String> fields() {
         return List.of(
+                "id",
                 "email",
+                "shops.id",
                 "shops.locationUrl",
                 "shops.detailsName",
                 "wallets.name",
