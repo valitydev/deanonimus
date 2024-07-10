@@ -201,8 +201,7 @@ public class ReadTest extends AbstractIntegrationTest {
         var party = givenParty("party-test-1", EMAIL);
         givenShop(party, SHOP, URL, "S2P_BRL");
         refreshIndices();
-        var searchHits = deanonimusServiceHandler.searchShopText("test");
-
+        var searchHits = deanonimusServiceHandler.searchShopText("party-test-1");
         assertFalse(searchHits.isEmpty());
         assertEquals(1, searchHits.size());
         assertTrue(searchHits.stream().anyMatch(shopHit -> shopHit.getParty().getId().equals("party-test-1")));
@@ -249,24 +248,21 @@ public class ReadTest extends AbstractIntegrationTest {
 
     @Test
     void searchShopTextByPartyIdAndShopId() {
-
         var party1 = givenParty("party-test-1", EMAIL);
         givenShop(party1, "shop-id-1", URL, "S2P_BRL-1");
         givenShop(party1, "shop-id-2", URL, "S2P_BRL-2");
-
         var party2 = givenParty("party-id-2", EMAIL);
         givenShop(party2, "shop-test-1", URL, "details-1");
         givenShop(party2, "shop-none-2", URL, "details-2");
-
-
         refreshIndices();
-        var searchHits = deanonimusServiceHandler.searchShopText("test");
-
+        var searchHits = deanonimusServiceHandler.searchShopText("party-test-1");
         assertFalse(searchHits.isEmpty());
-        assertEquals(3, searchHits.size());
-
-        var expected = Set.of("shop-id-1", "shop-id-2", "shop-test-1");
+        assertEquals(2, searchHits.size());
+        var expected = Set.of("shop-id-1", "shop-id-2");
         assertTrue(searchHits.stream().allMatch(shopHit -> expected.contains(shopHit.getShop().getId())));
+        searchHits = deanonimusServiceHandler.searchShopText("shop-test-1");
+        assertFalse(searchHits.isEmpty());
+        assertEquals(1, searchHits.size());
     }
 
     @Test
@@ -301,18 +297,13 @@ public class ReadTest extends AbstractIntegrationTest {
     void searchShopTextContainsShopIds() {
         Party party1 = givenParty(PARTY + "id-1", EMAIL);
         givenShop(party1, "test-id-1", URL);
-
         Party party2 = givenParty(PARTY + "id-2", EMAIL);
         givenShop(party2, "test-id-2", URL);
-
         refreshIndices();
-
-        List<SearchShopHit> searchShopHits = deanonimusServiceHandler.searchShopText("test");
-
+        List<SearchShopHit> searchShopHits = deanonimusServiceHandler.searchShopText("test-id-1");
         assertFalse(searchShopHits.isEmpty());
-        assertEquals(2, searchShopHits.size());
-
-        var expected = Set.of("test-id-1", "test-id-2");
+        assertEquals(1, searchShopHits.size());
+        var expected = Set.of("test-id-1");
         assertTrue(searchShopHits.stream().allMatch(shopHit -> expected.contains(shopHit.getShop().getId())));
     }
 
