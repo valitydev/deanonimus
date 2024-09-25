@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>deanonimus</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.2-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Deanonimus</name>
@@ -61,7 +61,7 @@
         <dependency>
             <groupId>dev.vality</groupId>
             <artifactId>fistful-proto</artifactId>
-            <version>1.166-be67e59</version>
+            <version>1.173-1c28618</version>
         </dependency>
         <!--spring-->
         <dependency>
