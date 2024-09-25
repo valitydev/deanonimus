@@ -20,15 +20,11 @@ public class ShopDomainToShopApiConverter implements Converter<dev.vality.deanon
                 .setContractId(shopDomain.getContractId())
                 .setDetails(new ShopDetails()
                         .setName(shopDomain.getDetailsName())
-                        .setDescription(shopDomain.getDetailsDescription()))
-                .setPayoutToolId(shopDomain.getPayoutToolId());
+                        .setDescription(shopDomain.getDetailsDescription()));
         setAccount(shopDomain, shop);
         var shopLocation = new ShopLocation();
         shopLocation.setUrl(shopDomain.getLocationUrl());
         shop.setLocation(shopLocation);
-        if (shopDomain.getPayoutScheduleId() != null) {
-            shop.setPayoutSchedule(new BusinessScheduleRef(shopDomain.getPayoutScheduleId()));
-        }
         return shop;
     }
 

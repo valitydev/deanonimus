@@ -39,6 +39,7 @@
         <dependency>
             <groupId>dev.vality</groupId>
             <artifactId>damsel</artifactId>
+            <version>1.646-7762f6c</version>
         </dependency>
         <dependency>
             <groupId>dev.vality.geck</groupId>
@@ -55,7 +56,7 @@
         <dependency>
             <groupId>dev.vality</groupId>
             <artifactId>deanonimus-proto</artifactId>
-            <version>1.40-2a02d87</version>
+            <version>1.41-6605c72</version>
         </dependency>
         <dependency>
             <groupId>dev.vality</groupId>
