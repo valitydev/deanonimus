@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>deanonimus</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.2-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Deanonimus</name>
@@ -55,7 +55,7 @@
         <dependency>
             <groupId>dev.vality</groupId>
             <artifactId>deanonimus-proto</artifactId>
-            <version>1.40-2a02d87</version>
+            <version>1.41-6605c72</version>
         </dependency>
         <dependency>
             <groupId>dev.vality</groupId>
