@@ -37,7 +37,7 @@ public class PartyCreatedHandler implements PartyManagementHandler {
         log.info("Start party created handling, sequenceId={}, partyId={}, changeId={}", sequenceId, partyId, changeId);
         Party party = new Party();
         party.setId(partyId);
-        party.setEmail(partyCreated.getContactInfo().getEmail());
+        party.setEmail(partyCreated.getContactInfo().getRegistrationEmail());
         party.setBlocking(Blocking.unblocked);
         party.setSuspension(Suspension.active);
 

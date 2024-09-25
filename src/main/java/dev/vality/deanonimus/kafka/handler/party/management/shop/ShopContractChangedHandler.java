@@ -49,7 +49,6 @@ public class ShopContractChangedHandler extends AbstractClaimChangedHandler {
         Shop shop = party.getShopById(shopId).orElseThrow(() -> new ShopNotFoundException(shopId));
 
         shop.setContractId(contractChanged.getContractId());
-        shop.setPayoutToolId(contractChanged.getPayoutToolId());
 
         openSearchService.updateParty(party);
 

@@ -26,8 +26,7 @@ public class Shop {
     private String accountCurrencyCode;
     private Long accountSettlement;
     private Long accountGuarantee;
+    // Deprecated
     private Long accountPayout;
     private String contractId;
-    private String payoutToolId;
-    private Integer payoutScheduleId;
 }
